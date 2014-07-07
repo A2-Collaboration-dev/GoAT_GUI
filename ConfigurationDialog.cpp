@@ -500,6 +500,7 @@ void ConfigurationDialog::updateUIText()
         configFile.getCut_dE_E_Taps_Electron() != configFile.nullValue)
     {
     // Cuts
+    ui->toolBox->setItemEnabled(1, true);
     ui->labelPRProtons->setText(QString(configFile.getCut_dE_E_CB_Proton().c_str()));
     ui->labelPRPions->setText(QString(configFile.getCut_dE_E_CB_Pion().c_str()));
     ui->labelPRElectrons->setText(QString(configFile.getCut_dE_E_CB_Electron().c_str()));
