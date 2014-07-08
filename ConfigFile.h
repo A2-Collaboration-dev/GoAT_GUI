@@ -50,6 +50,7 @@ private:
 
 public:
     static const std::string nullValue;
+    static const std::vector<std::string> TextFields;
 
     ConfigFile();
     ConfigFile(std::string file);

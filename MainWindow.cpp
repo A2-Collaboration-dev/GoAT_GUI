@@ -83,6 +83,8 @@ void MainWindow::FileChecker()
 
 void MainWindow::ACQUdirChanged(const QString & path)
 {
+  std::cout << "ACQUdirChanged method called." << std::endl;
+
   if (this->continueScanning)
   {
       std::string newFile = getNewestFile(configGUI.getACQUDir(), "*.root");

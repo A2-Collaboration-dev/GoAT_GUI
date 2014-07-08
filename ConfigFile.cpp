@@ -6,6 +6,34 @@ using namespace std;
 
 const std::string ConfigFile::nullValue = "nokey";
 
+const std::vector<std::string> ConfigFile::TextFields = {
+"#=======================================================================\n\
+# Global Config file for a GoAT analysis\n\
+#=======================================================================\n\
+#-----------------------------------------------------------------------\n\
+# General Setup\n\
+#-----------------------------------------------------------------------\n\n\
+Period-Macro:	100000\n\n",
+
+
+"#-----------------------------------------------------------------------\n\
+# Particle Reconstruction\n\
+#-----------------------------------------------------------------------\n",
+
+"#-----------------------------------------------------------------------\n\
+# Meson Reconstruction\n\
+#-----------------------------------------------------------------------\n",
+
+"#-----------------------------------------------------------------------\n\
+# Sorting Preferences\n\
+#-----------------------------------------------------------------------\n\
+# Just turn off a sort completely to ignore a sorting preference\n\
+# Use +, - or = to set counters (ex. 3- will accept 3 or less)\n\n\
+# Sort on number of raw particle tracks (total, CB, and TAPS)\n\
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\
+#					Total 	CB		TAPS\n"
+};
+
 ConfigFile::ConfigFile()
 {
     this->ParticleReconstruction = std::string("1");
@@ -82,7 +110,9 @@ void ConfigFile::writeGoATConfigFile(const std::string filename)
     std::ofstream outfile (filename.c_str(),std::ofstream::binary);
     std::string outputData("");
 
-    outputData.append("Period-Macro:	100000\nCheckCBStability: 1\n");
+    outputData.append(TextFields[0]);
+    outputData.append(TextFields[1]);
+    //outputData.append("Period-Macro:	100000\nCheckCBStability: 1\n");
 
     if (this->ParticleReconstruction != nullValue)
         outputData.append("Do-Particle-Reconstruction: ").append(this->ParticleReconstruction).append("\n");
@@ -101,13 +131,19 @@ void ConfigFile::writeGoATConfigFile(const std::string filename)
     if (this->Cut_dE_E_TAPS_Electron != nullValue)
         outputData.append("Cut-dE-E-TAPS-Electron: ").append(this->Cut_dE_E_TAPS_Electron).append("\n");
     if (this->MesonReconstruction != nullValue)
+
+    outputData.append("\n");
+    outputData.append(TextFields[2]);
         outputData.append("Do-Meson-Reconstruction: ").append(this->MesonReconstruction).append("\n");
     if (this->Cut_IM_Width_Pi0 != nullValue)
         outputData.append("Cut-IM-Width-Pi0: ").append(this->Cut_IM_Width_Pi0).append("\n");
     if (this->Cut_IM_Width_Eta != nullValue)
         outputData.append("Cut-IM-Width-Eta: ").append(this->Cut_IM_Width_Eta).append("\n");
     if (this->Cut_IM_Width_Eta_Prime != nullValue)
-        outputData.append("Cut-IM-Width-Eta-Prime: ").append(this->Cut_IM_Width_Eta_Prime).append("\n");
+        outputData.append("Cut-IM-Width-Eta-Prime: ").append(this->Cut_IM_Width_Eta_Prime).append("\n\n");
+
+
+    outputData.append(TextFields[3]);
 
     if (this->SortRawNParticlesTotal != nullValue &&
         this->SortRawNParticlesCB != nullValue &&
@@ -281,7 +317,7 @@ void ConfigFile::setSortRawNParticlesTAPS(std::string sign, std::string str)
 
 void ConfigFile::setSortRawEnergyCB(std::string str)
 {
-    this->SortRawCBEnergySum = str;
+    this->SortRawCBEnergySum = str + "+";
 }
 
 void ConfigFile::setCut_IM_Width_Pi0(std::string str)

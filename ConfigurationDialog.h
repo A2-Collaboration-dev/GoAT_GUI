@@ -141,7 +141,6 @@ private slots:
     void on_lineEditConfigMRWidthPi0_editingFinished();
     void on_lineEditConfigMRWidthEta_editingFinished();
     void on_lineEditConfigMRWidthEtaprime_editingFinished();
-    void on_checkBoxCMR_clicked();
 };
 
 

@@ -512,6 +512,10 @@ void ConfigurationDialog::updateUIText()
         ui->lineEditConfigMRWidthEta->setText(QString(configFile.getCut_IM_Width_Eta().c_str()));
         ui->lineEditConfigMRWidthEtaprime->setText(QString(configFile.getCut_IM_Width_Eta_Prime().c_str()));
 
+    if (configFile.getMesonReconstruction() == "1")
+    {
+        ui->checkBoxCMR->setChecked(true);
+    }
 
     ui->pushButton->setEnabled(true);
 
@@ -519,20 +523,19 @@ void ConfigurationDialog::updateUIText()
 
 void ConfigurationDialog::on_lineEditConfigMRWidthPi0_editingFinished()
 {
+    if (!ui->lineEditConfigMRWidthPi0->text().toStdString().empty())
     configFile.setCut_IM_Width_Pi0(ui->lineEditConfigMRWidthPi0->text().toStdString());
 }
 
 void ConfigurationDialog::on_lineEditConfigMRWidthEta_editingFinished()
 {
+    if (!ui->lineEditConfigMRWidthEta->text().toStdString().empty())
     configFile.setCut_IM_Width_Eta(ui->lineEditConfigMRWidthEta->text().toStdString());
 }
 
 void ConfigurationDialog::on_lineEditConfigMRWidthEtaprime_editingFinished()
 {
+    if (!ui->lineEditConfigMRWidthEtaprime->text().toStdString().empty())
     configFile.setCut_IM_Width_Eta_Prime(ui->lineEditConfigMRWidthEtaprime->text().toStdString());
 }
 
-void ConfigurationDialog::on_checkBoxCMR_clicked()
-{
-
-}
