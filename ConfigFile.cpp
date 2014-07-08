@@ -284,6 +284,21 @@ void ConfigFile::setSortRawEnergyCB(std::string str)
     this->SortRawCBEnergySum = str;
 }
 
+void ConfigFile::setCut_IM_Width_Pi0(std::string str)
+{
+    this->Cut_IM_Width_Pi0 = str;
+}
+
+void ConfigFile::setCut_IM_Width_Eta(std::string str)
+{
+    this->Cut_IM_Width_Eta = str;
+}
+
+void ConfigFile::setCut_IM_Width_Eta_Prime(std::string str)
+{
+    this->Cut_IM_Width_Eta_Prime = str;
+}
+
 std::string ConfigFile::getParticleReconstruction()
 {
     return this->ParticleReconstruction;
@@ -359,4 +374,19 @@ std::string ConfigFile::getSortRawNParticlesTAPS()
 std::string ConfigFile::getSortRawEnergyCB()
 {
     return this->SortRawCBEnergySum;
+}
+
+std::string ConfigFile::getCut_IM_Width_Pi0()
+{
+    return this->Cut_IM_Width_Pi0;
+}
+
+std::string ConfigFile::getCut_IM_Width_Eta()
+{
+    return this->Cut_IM_Width_Eta;
+}
+
+std::string ConfigFile::getCut_IM_Width_Eta_Prime()
+{
+    return this->Cut_IM_Width_Eta_Prime;
 }

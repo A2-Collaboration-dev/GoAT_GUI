@@ -294,10 +294,6 @@ void ConfigurationDialog::on_pushButtonPRTapsPions_clicked()
     configFile.setCut_dE_E_Taps_Pion(inputFile.toStdString());
 }
 
-void ConfigurationDialog::on_lineEditConfigMRWidth_textChanged(const QString &arg1)
-{
-    // may be not needed
-}
 
 void ConfigurationDialog::on_lineEditConfigPreSortParticleTotal_editingFinished()
 {
@@ -512,6 +508,31 @@ void ConfigurationDialog::updateUIText()
         ui->labelPRTapsElectrons->setText(QString(configFile.getCut_dE_E_Taps_Electron().c_str()));
     }
 
+        ui->lineEditConfigMRWidthPi0->setText(QString(configFile.getCut_IM_Width_Pi0().c_str()));
+        ui->lineEditConfigMRWidthEta->setText(QString(configFile.getCut_IM_Width_Eta().c_str()));
+        ui->lineEditConfigMRWidthEtaprime->setText(QString(configFile.getCut_IM_Width_Eta_Prime().c_str()));
+
+
     ui->pushButton->setEnabled(true);
+
+}
+
+void ConfigurationDialog::on_lineEditConfigMRWidthPi0_editingFinished()
+{
+    configFile.setCut_IM_Width_Pi0(ui->lineEditConfigMRWidthPi0->text().toStdString());
+}
+
+void ConfigurationDialog::on_lineEditConfigMRWidthEta_editingFinished()
+{
+    configFile.setCut_IM_Width_Eta(ui->lineEditConfigMRWidthEta->text().toStdString());
+}
+
+void ConfigurationDialog::on_lineEditConfigMRWidthEtaprime_editingFinished()
+{
+    configFile.setCut_IM_Width_Eta_Prime(ui->lineEditConfigMRWidthEtaprime->text().toStdString());
+}
+
+void ConfigurationDialog::on_checkBoxCMR_clicked()
+{
 
 }

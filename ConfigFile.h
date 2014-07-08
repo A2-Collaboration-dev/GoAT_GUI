@@ -27,6 +27,7 @@ private:
     std::string Cut_dE_E_TAPS_Pion;
     std::string Cut_dE_E_TAPS_Electron;
 
+
     /* Meson reconstruction */
     std::string Cut_IM_Width_Pi0;
     std::string Cut_IM_Width_Eta;
@@ -68,11 +69,18 @@ public:
     void setCut_dE_E_Taps_Pion(std::string str);
     void setCut_dE_E_Taps_Electron(std::string str);
 
+    /* Meson reconstruction */
+    void setCut_IM_Width_Pi0(std::string str);
+    void setCut_IM_Width_Eta(std::string str);
+    void setCut_IM_Width_Eta_Prime(std::string str);
+
     /* Pre sorting */
     void setSortRawNParticlesTotal(std::string sign, std::string str);
     void setSortRawNParticlesCB(std::string sign, std::string str);
     void setSortRawNParticlesTAPS(std::string sign, std::string str);
     void setSortRawEnergyCB(std::string str);
+
+
 
     std::string getParticleReconstruction();
     std::string getChargedParticleReconstruction();
@@ -90,6 +98,12 @@ public:
     std::string getSortRawNParticlesCB();
     std::string getSortRawNParticlesTAPS();
     std::string getSortRawEnergyCB();
+
+    /* Meson reconstruction */
+    std::string getCut_IM_Width_Pi0();
+    std::string getCut_IM_Width_Eta();
+    std::string getCut_IM_Width_Eta_Prime();
+
 
     void loadGoATConfigFile(const char* config_file);
     void loadGoATConfigFile(const std::string config_file);

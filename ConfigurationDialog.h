@@ -75,8 +75,6 @@ private slots:
 
     void on_pushButtonPRTapsPions_clicked();
 
-    void on_lineEditConfigMRWidth_textChanged(const QString &arg1);
-
     void on_lineEditConfigPreSortParticleTotal_editingFinished();
 
     void on_lineEditConfigPreSortParticleCB_editingFinished();
@@ -140,6 +138,10 @@ private slots:
     void on_spinBoxMin_valueChanged(double arg1);
     void on_spinBoxMax_valueChanged(double arg1);
     void on_pushButtonSelectCuts_clicked();
+    void on_lineEditConfigMRWidthPi0_editingFinished();
+    void on_lineEditConfigMRWidthEta_editingFinished();
+    void on_lineEditConfigMRWidthEtaprime_editingFinished();
+    void on_checkBoxCMR_clicked();
 };
 
 
