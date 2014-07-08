@@ -492,6 +492,7 @@ void ConfigurationDialog::updateUIText()
     // Min Energy value
     ui->lineEditConfigPreSortEnergySum->setText(QString(configFile.getSortRawEnergyCB().c_str()));
 
+    // If cuts are specified
     if (configFile.getCut_dE_E_CB_Proton() != configFile.nullValue ||
         configFile.getCut_dE_E_CB_Pion() != configFile.nullValue ||
         configFile.getCut_dE_E_CB_Electron() != configFile.nullValue ||
@@ -499,16 +500,16 @@ void ConfigurationDialog::updateUIText()
         configFile.getCut_dE_E_Taps_Pion()    != configFile.nullValue ||
         configFile.getCut_dE_E_Taps_Electron() != configFile.nullValue)
     {
-    // Cuts
-    ui->toolBox->setItemEnabled(1, true);
-    //comment here
-    ui->labelPRProtons->setText(QString(configFile.getCut_dE_E_CB_Proton().c_str()));
-    ui->labelPRPions->setText(QString(configFile.getCut_dE_E_CB_Pion().c_str()));
-    ui->labelPRElectrons->setText(QString(configFile.getCut_dE_E_CB_Electron().c_str()));
+        ui->checkBoxCPR->setChecked(true);
 
-    ui->labelPRTapsProtons->setText(QString(configFile.getCut_dE_E_Taps_Proton().c_str()));
-    ui->labelPRTapsPions->setText(QString(configFile.getCut_dE_E_Taps_Pion().c_str()));
-    ui->labelPRTapsElectrons->setText(QString(configFile.getCut_dE_E_Taps_Electron().c_str()));
+        // Cut locations
+        ui->labelPRProtons->setText(QString(configFile.getCut_dE_E_CB_Proton().c_str()));
+        ui->labelPRPions->setText(QString(configFile.getCut_dE_E_CB_Pion().c_str()));
+        ui->labelPRElectrons->setText(QString(configFile.getCut_dE_E_CB_Electron().c_str()));
+
+        ui->labelPRTapsProtons->setText(QString(configFile.getCut_dE_E_Taps_Proton().c_str()));
+        ui->labelPRTapsPions->setText(QString(configFile.getCut_dE_E_Taps_Pion().c_str()));
+        ui->labelPRTapsElectrons->setText(QString(configFile.getCut_dE_E_Taps_Electron().c_str()));
     }
 
     ui->pushButton->setEnabled(true);

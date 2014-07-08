@@ -18,18 +18,30 @@ TabLog::~TabLog()
 void TabLog::AppendTextNL(std::string str)
 {
     std::string Time =  QTime::currentTime().toString().toStdString();
-    std::string newText = Bold(Time + ": ") + str + "\n";
+    std::string newText = Bold(Time + ": ") + str;
     ui->textBrowser->append(QString(newText.c_str()).replace('\n', "<br>"));
 }
 
 void TabLog::AppendTextNL(std::string title, std::string str)
 {
     std::string Time =  QTime::currentTime().toString().toStdString();
-    std::string newText = Bold(Time + " : ") + title + "\n" + str + "\n";
+    std::string newText = Bold(Time + " : ") + title + "\n" + str;
+    ui->textBrowser->append(QString(newText.c_str()).replace('\n', "<br>"));
+}
+
+void TabLog::AppendTextNL(std::string title, char* color, std::string str)
+{
+    std::string Time =  QTime::currentTime().toString().toStdString();
+    std::string newText = Bold(Time + " : ") + Color(title, color) + "\n" + str;
     ui->textBrowser->append(QString(newText.c_str()).replace('\n', "<br>"));
 }
 
 std::string TabLog::Bold(std::string str)
 {
     return "<b>" + str + "</b>";
+}
+
+std::string TabLog::Color(std::string str, char* color)
+{
+    return std::string("<font color=\"") + color + std::string("\">") + str + std::string("</font>");
 }

@@ -19,9 +19,10 @@ public:
 
     void AppendTextNL(std::string str);
     void AppendTextNL(std::string title, std::string str);
-    void AppendTextNL(std::string title, int colour, std::string str);
+    void AppendTextNL(std::string title, char* color, std::string str);
 
     std::string Bold(std::string str);
+    std::string Color(std::string, char *color);
 private:
     Ui::TabLog *ui;
 };
