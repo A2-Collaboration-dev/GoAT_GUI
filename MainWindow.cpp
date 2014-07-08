@@ -1,6 +1,13 @@
 #include "MainWindow.h"
 #include "ui_mainwindow.h"
 
+#include <TROOT.h>
+#include <TSystemFile.h>
+#include <TSystemDirectory.h>
+
+#include <chrono>
+#include <thread>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -47,9 +54,10 @@ MainWindow::MainWindow(QWidget *parent) :
      */
     this->curFile = this->configGUI.getLastFile();
     this->continueScanning = true;
+    this->OpeningAtempt = 0;
     this->watcher = new QFileSystemWatcher(this);
     this->watcher->addPath(this->configGUI.getACQUDir().c_str());
-    connect(watcher, SIGNAL(directoryChanged(const QString &)), this, SLOT(ACQUdirChanged(const QString &)));
+    connect(watcher, SIGNAL(directoryChanged(const QString &)), this, SLOT(ACQUdirChanged(const QString &))); 
 
     /*
      * Signal of when GoAT is finished
@@ -81,40 +89,75 @@ void MainWindow::FileChecker()
 
 }
 
-void MainWindow::ACQUdirChanged(const QString & path)
+bool is_digits(const std::string &str)
+{
+    return str.find_first_not_of("0123456789") == std::string::npos;
+}
+
+void MainWindow::ACQUdirChanged(QString path)
 {
   std::cout << "ACQUdirChanged method called." << std::endl;
 
+  std::cout << continueScanning << std::endl;
+  std::cout << OpeningAtempt << std::endl;
   if (this->continueScanning)
   {
+      if (this->OpeningAtempt >= 5)
+          return;
+
       std::string newFile = getNewestFile(configGUI.getACQUDir(), "*.root");
 
-      if (newFile != curFile && newFile != "")
+      if ((newFile != curFile && newFile != "") || OpeningAtempt > 0)
       {
           this->curFile = newFile;
-          tabLog->AppendTextNL("New file detected: " + this->curFile);
+
+          if (this->OpeningAtempt == 0)
+            tabLog->AppendTextNL("New file detected: " + this->curFile);
 
           /*
            * exe goat make changes here, goat is incompatible with custom configFile path
            */
-          *arguments << "-f" << "Raw_CB_41901.root" << "configfiles/GoAT-example.dat";
+          *arguments << "-f" << this->curFile.c_str()
+                     << "-D" << configGUI.getGoATDir().c_str()
+                     << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
           /*
            * Experimental
            */
+
+          TFile *file_in = TFile::Open(this->curFile.c_str());
+          if(!file_in)
+          {
+              tabLog->AppendTextNL("File is being accessed by another program, trying again in 5 seconds.");
+              std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
+
+              std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+              this->OpeningAtempt++;
+              this->ACQUdirChanged(path);
+              return;
+          }
+          file_in->Close();
+
+          std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+          /*
           std::ifstream ifs(this->curFile);
           if (!ifs)
           {
               tabLog->AppendTextNL("Input stream seems to be associated with: " + this->curFile);
-              std::cout << "bla bla error " << std::endl;
+              std::cout << "bla bla stream error " << std::endl;
               return;
           }
+          */
 
               tabLog->AppendTextNL("Starting <b>GoAT</b> with " + this->curFile);
-              process->setWorkingDirectory("/home/august/a2GoAT/");
-              process->start("build/bin/goat", *arguments);
+              //process->setWorkingDirectory("/home/august/a2GoAT/");
+              process->start(configGUI.getGoATExe().c_str(), *arguments);
 
               this->continueScanning = false;
+              this->OpeningAtempt = 0;
+              std::cout << "stop scanning" << std::endl;
 
       }
   }
@@ -133,6 +176,7 @@ void MainWindow::newGoatFile()
 
     std::cout << "finished" << std::endl;
     this->continueScanning = true;
+    this->OpeningAtempt = 0;
 
     tabLog->AppendTextNL("GoAT Output Stream", p_stdout.toStdString());
     tabLog->AppendTextNL("GoAT Error Stream", p_stderr.toStdString());

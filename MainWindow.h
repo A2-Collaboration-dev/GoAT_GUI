@@ -60,9 +60,11 @@ private:
     QProcess* process;
     QStringList* arguments;
 
+    int OpeningAtempt;
+
 private slots:
 
-  void ACQUdirChanged(const QString & path);
+  void ACQUdirChanged(QString path);
   void newGoatFile();
 
   void on_actionEdig_config_file_triggered();
