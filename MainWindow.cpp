@@ -115,7 +115,6 @@ void MainWindow::ACQUdirChanged(QString path)
 
     if ((newFile != this->curFile && newFile != "") || OpeningAtempt > 0)
     {
-        std::cout << "step 1" << std::endl;
         if (this->process->state() == QProcess::NotRunning)
         {
             /* Attempt to open the file that was being used by another program */
@@ -227,7 +226,7 @@ void MainWindow::RunGoat()
     TFile *file_in = TFile::Open(this->curFile.c_str());
     if(!file_in)
     {
-        tabLog->AppendTextNL("File is being accessed by another program, trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
+        tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
         std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
 
         TakeANap(5000);
@@ -243,8 +242,11 @@ void MainWindow::RunGoat()
 
     TakeANap(5000);
 
+
     tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
-    process->start(configGUI.getGoATExe().c_str(), *arguments);
+
+    if (this->process->state() == QProcess::NotRunning)
+        process->start(configGUI.getGoATExe().c_str(), *arguments);
 }
 
 void MainWindow::TakeANap(int ms)
