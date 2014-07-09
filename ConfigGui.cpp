@@ -13,6 +13,18 @@ ConfigGUI::ConfigGUI()
     LastGoATFile = nullValue;
 }
 
+ConfigGUI::ConfigGUI(std::string filepath)
+{
+    GoAT_Config = nullValue;
+    GoAT_Exe = nullValue;
+    ACQU_Dir = nullValue;
+    GoAT_Dir = nullValue;
+    LastFile = nullValue;
+    Physics_Dir = nullValue;
+    LastGoATFile = nullValue;
+    ConfigFilePath = filepath;
+}
+
 void ConfigGUI::PrintAll()
 {
     std::cout << this->GoAT_Config << std::endl;
@@ -76,6 +88,11 @@ void ConfigGUI::writeGUIConfigFile(const std::string filename)
 
     outfile.write (outputData.c_str(),outputData.size());
     outfile.close();
+}
+
+void ConfigGUI::writeGUIConfigFile()
+{
+    this->writeGUIConfigFile(this->ConfigFilePath);
 }
 
 std::string ConfigGUI::ReadConfig(const std::string& key_in, const Int_t instance, const Char_t* configname)

@@ -15,12 +15,15 @@ public:
     static const std::string nullValue;
 
     ConfigGUI();
+    ConfigGUI(std::string filepath);
 
     bool loadGUIConfigFile(const char* config_file);
     bool loadGUIConfigFile(const std::string config_file);
 
     void writeGUIConfigFile(const char* filename);
     void writeGUIConfigFile(const std::string filename);
+
+    void writeGUIConfigFile();
 
     std::string getGoATConfig();
     std::string getGoATExe();
@@ -47,6 +50,7 @@ private:
     std::string Physics_Dir;
     std::string LastFile;
     std::string LastGoATFile;
+    std::string ConfigFilePath;
 
 };
 
