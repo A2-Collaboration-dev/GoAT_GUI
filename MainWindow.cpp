@@ -134,6 +134,7 @@ void MainWindow::ACQUdirChanged(QString path)
                 this->ACQUFilesQueue.erase(ACQUFilesQueue.begin());
                 tabLog->setLabelLastACQU(this->curFile);
                 configGUI.setLastACQUFile(this->curFile);
+                //future = QtConcurrent::run(this, &MainWindow::RunGoat);
                 RunGoat();
                 return;
             }
@@ -142,6 +143,7 @@ void MainWindow::ACQUdirChanged(QString path)
             this->curFile = newFile;
             tabLog->setLabelLastACQU(this->curFile);
             configGUI.setLastACQUFile(this->curFile);
+            //future = QtConcurrent::run(this, &MainWindow::RunGoat);
             RunGoat();
             return;
 
@@ -157,46 +159,6 @@ void MainWindow::ACQUdirChanged(QString path)
 
 }
 
-
-//void MainWindow::ACQUdirChanged(std::string path)
-//{
-//    std::cout << "ACQUdirChanged method called." << std::endl;
-//    int MaxContinueAttempts = 5;
-
-//    std::string newFile = getNewestFile(configGUI.getACQUDir(), "*.root");
-
-//    if ((newFile != this->curFile && newFile != "") || OpeningAtempt > 0)
-//    {
-//        /* Updating with new file path */
-//        if (this->continueScanning)
-//        {
-//            this->curFile = newFile;
-//            tabLog->setLabelLastACQU(this->curFile);
-//            configGUI.setLastACQUFile(this->curFile);
-
-//            if (this->OpeningAtempt >= MaxContinueAttempts)
-//            {
-//                tabLog->AppendText1L("File Error: ", "DarkMagenta", "Could not open " + this->curFile + ". Possible causes: file is still being copied or is corrupted.");
-//                this->OpeningAtempt = 0;
-//                this->continueScanning = true;
-//                return;
-//            }
-
-//            if (this->OpeningAtempt == 0)
-//              tabLog->AppendTextNL("New file detected: " + this->curFile);
-
-//            /* Arguments to start GoAT */
-//            *arguments << "-f" << this->curFile.c_str()
-//                       << "-D" << configGUI.getGoATDir().c_str()
-//                       << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
-//            // start GoAT
-
-//        } else {
-//            /* A new file found, but business with old one is not finished */
-//            tabLog->AppendText1L("File Error: ", "DarkMagenta", "Could not open " + this->curFile + ". Possible causes: file is still being copied or is corrupted.");
-//        }
-//    }
-//}
 
 void MainWindow::RunGoat()
 {
@@ -223,7 +185,7 @@ void MainWindow::RunGoat()
      * Checking if file is in use (usually working)
      */
 
-    TFile *file_in = TFile::Open(this->curFile.c_str());
+    TFile *file_in = TFile::Open(this->curFile.c_str(), "READ");
     if(!file_in)
     {
         tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
@@ -258,91 +220,12 @@ void MainWindow::TakeANap(int ms)
     }
 }
 
-//void MainWindow::ACQUdirChanged(QString path)
-//{
-//  std::cout << "ACQUdirChanged method called." << std::endl;
-//  int MaxContinueAttempts = 5;
-
-
-
-//  if (this->continueScanning)
-//  {
-//      if (this->OpeningAtempt >= MaxContinueAttempts)
-//      {
-//          tabLog->AppendText1L("File Error: ", "DarkMagenta", "Could not open " + this->curFile + ". Possible causes: file is still being copied or is corrupted.");
-//          this->OpeningAtempt = 0;
-//          this->continueScanning = true;
-//          return;
-//      }
-
-//      std::string newFile = getNewestFile(configGUI.getACQUDir(), "*.root");
-
-//      if ((newFile != curFile && newFile != "") || OpeningAtempt > 0)
-//      {
-//          this->curFile = newFile;
-//          tabLog->setLabelLastACQU(this->curFile);
-//          configGUI.setLastACQUFile(this->curFile);
-
-//          if (this->OpeningAtempt == 0)
-//            tabLog->AppendTextNL("New file detected: " + this->curFile);
-
-//          /*
-//           * exe goat make changes here, goat is incompatible with custom configFile path
-//           */
-//          *arguments << "-f" << this->curFile.c_str()
-//                     << "-D" << configGUI.getGoATDir().c_str()
-//                     << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
-
-//          /*
-//           * Checking if file is in use (usually working)
-//           */
-
-//          TFile *file_in = TFile::Open(this->curFile.c_str());
-//          if(!file_in)
-//          {
-//              tabLog->AppendTextNL("File is being accessed by another program, trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
-//              std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
-
-//              QTime dieTime = QTime::currentTime().addMSecs( 10000 );
-//              while( QTime::currentTime() < dieTime )
-//              {
-//                  QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
-//              }
-//              //std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-
-//              this->OpeningAtempt++;
-//              this->ACQUdirChanged(path);
-//              return;
-//          }
-//          file_in->Close();
-
-//          //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-//          this->continueScanning = false;
-//          this->OpeningAtempt = 0;
-//          std::cout << "stop scanning" << std::endl;
-
-//          QTime dieTime = QTime::currentTime().addMSecs( 5000 );
-//          while( QTime::currentTime() < dieTime )
-//          {
-//              QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
-//          }
-
-//          tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
-//          //process->setWorkingDirectory("/home/august/a2GoAT/");
-//          process->start(configGUI.getGoATExe().c_str(), *arguments);
-
-
-
-//      }
-//  }
-//}
 
 void MainWindow::ForceRunGoAT()
 {
     if (process->state() != QProcess::NotRunning)
     {
-        tabLog->AppendText1L("Error: ", "DarkMagenta", "GoAT process is already running.");
+        tabLog->AppendText1L("<b>Error:</b> ", "DarkMagenta", TabLog::ColorB("GoAT", "BlueViolet") + " process is already running.");
         return;
     }
 

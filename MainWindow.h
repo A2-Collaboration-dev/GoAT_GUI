@@ -23,6 +23,7 @@
 #include <QFileSystemWatcher>
 #include <QProcess>
 #include <TROOT.h>
+#include <QFuture>
 
 namespace Ui {
 class MainWindow;
@@ -45,8 +46,9 @@ private:
     Ui::MainWindow *ui;
 
     QFuture<void> future;
+    QThread *thread;
+
     void FileChecker();
-    void RunGoat();
     void TakeANap(int ms);
 
     ConfigurationDialog *configurationDialog;
@@ -73,6 +75,7 @@ private slots:
   void ForceRunGoAT();
   void killGoatProcess();
   void on_actionEdig_config_file_triggered();
+  void RunGoat();
 };
 
 #endif // MAINWINDOW_H

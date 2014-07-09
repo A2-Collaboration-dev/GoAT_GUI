@@ -7,6 +7,10 @@ TabLog::TabLog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->textBrowser->setAcceptRichText(true);
+    LogFileName = QDate::currentDate().toString().toStdString() + QTime::currentTime().toString().toStdString();
+
+
+    connect(ui->textBrowser, SIGNAL(textChanged()), this, SLOT(WriteLogToFile()));
 }
 
 TabLog::~TabLog()
@@ -16,6 +20,14 @@ TabLog::~TabLog()
 
 void TabLog::AppendText1L(std::string title, char* color, std::string str)
 {
+    std::string Time =  QTime::currentTime().toString().toStdString();
+    std::string newText = Bold(Time + " : ") + Color(title, color) + str;
+    ui->textBrowser->append(QString(newText.c_str()).replace('\n', "<br>"));
+}
+
+void TabLog::AppendText1L(char* t, char* color, std::string str)
+{
+    std::string title(t);
     std::string Time =  QTime::currentTime().toString().toStdString();
     std::string newText = Bold(Time + " : ") + Color(title, color) + str;
     ui->textBrowser->append(QString(newText.c_str()).replace('\n', "<br>"));
@@ -76,4 +88,19 @@ QPushButton* TabLog::getButtonRunGoAT()
 QPushButton* TabLog::getButtonKillGoAT()
 {
     return ui->buttonKillGoAT;
+}
+
+void TabLog::WriteLogToFile()
+{
+    std::ofstream outfile (QCoreApplication::applicationDirPath().toStdString() + std::string("/logs/" + LogFileName + ".txt"), std::ofstream::binary);
+    std::string outputData(ui->textBrowser->document()->toPlainText().toStdString());
+
+    outfile.write (outputData.c_str(),outputData.size());
+    outfile.close();
+}
+
+void TabLog::on_pushButton_clicked()
+{
+    ui->textBrowser->setText("");
+    LogFileName = QDate::currentDate().toString().toStdString() + QTime::currentTime().toString().toStdString();
 }

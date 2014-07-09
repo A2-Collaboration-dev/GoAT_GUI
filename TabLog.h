@@ -5,6 +5,7 @@
 #include <QTime>
 #include <iostream>
 #include <QPushButton>
+#include<fstream>
 
 namespace Ui {
 class TabLog;
@@ -22,6 +23,8 @@ public:
     void AppendTextNL(std::string title, std::string str);
     void AppendTextNL(std::string title, char* color, std::string str);
     void AppendText1L(std::string title, char* color, std::string str);
+    void AppendText1L(char*, char* color, std::string str);
+
 
     static std::string Bold(std::string str);
     static std::string Color(std::string, char *color);
@@ -35,6 +38,11 @@ public:
 
 private:
     Ui::TabLog *ui;
+    std::string LogFileName;
+
+private slots:
+    void WriteLogToFile();
+    void on_pushButton_clicked();
 };
 
 #endif // TABLOG_H

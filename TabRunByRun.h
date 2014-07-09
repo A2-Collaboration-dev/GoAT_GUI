@@ -58,13 +58,6 @@ private slots:
 
 public slots:
         void updateAllGraphics();
-        void showModified(const QString& str)
-        {
-
-            //Q_UNUSED(str)
-         //   QMessageBox::information(this,"Directory Modified", "Your Directory is modified");
-            std::cout << "DIRECTORY UPDATED */" << std::endl;
-        }
 private:
     Ui::TabRunByRun *ui;
     int horizontalSize;
