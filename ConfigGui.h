@@ -35,8 +35,9 @@ public:
 
     void setLastFile(std::string);
     void setLastGoATFile(std::string);
-
     void setLastACQUFile(std::string file);
+
+    void setConfigFilePath(std::string);
 
     void PrintAll();
 

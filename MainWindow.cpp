@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
                      QCoreApplication::applicationDirPath().toStdString() + std::string("/config/settings.gui") << std::endl;
         return;
     }
+    configGUI.setConfigFilePath(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/settings.gui"));
 
     /*
      * Setting labels
@@ -101,10 +102,16 @@ void MainWindow::FileChecker()
 
 void MainWindow::ACQUdirChanged(QString path)
 {
-    std::cout << "ACQUdirChanged method called." << std::endl;
-
 
     std::string newFile = getNewestFile(configGUI.getACQUDir(), "*.root");
+
+    /* Checking if this file was already used before */
+    if((std::find(FinishedACQUFiles.begin(), FinishedACQUFiles.end(), newFile) != FinishedACQUFiles.end()))
+    {
+        tabLog->AppendTextNL("File was already used in GoAT: " + TabLog::Color(newFile, "DarkOliveGreen"));
+        return;
+    }
+
 
     if ((newFile != this->curFile && newFile != "") || OpeningAtempt > 0)
     {
@@ -200,9 +207,10 @@ void MainWindow::RunGoat()
     int MaxContinueAttempts = 5;
 
     // are we attempting to check file?
-    if (OpeningAtempt >= MaxContinueAttempts)
+    if (this->OpeningAtempt >= MaxContinueAttempts)
     {
-        std::cout << "ABOVE 5" << std::endl;
+        tabLog->AppendText1L("File Error: ", "DarkMagenta", "Could not open " + this->curFile + ". Possible causes: file is still being copied or is corrupted.");
+        this->OpeningAtempt = 0;
         return;
     }
 
@@ -222,11 +230,7 @@ void MainWindow::RunGoat()
         tabLog->AppendTextNL("File is being accessed by another program, trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
         std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
 
-        QTime dieTime = QTime::currentTime().addMSecs( 5000 );
-        while( QTime::currentTime() < dieTime )
-        {
-            QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
-        }
+        TakeANap(5000);
 
         this->OpeningAtempt++;
         this->RunGoat();
@@ -237,16 +241,19 @@ void MainWindow::RunGoat()
     this->OpeningAtempt = 0;
     std::cout << "stop scanning" << std::endl;
 
-    QTime dieTime = QTime::currentTime().addMSecs( 5000 );
+    TakeANap(5000);
+
+    tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
+    process->start(configGUI.getGoATExe().c_str(), *arguments);
+}
+
+void MainWindow::TakeANap(int ms)
+{
+    QTime dieTime = QTime::currentTime().addMSecs( ms );
     while( QTime::currentTime() < dieTime )
     {
         QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
     }
-
-    tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
-    process->start(configGUI.getGoATExe().c_str(), *arguments);
-
-    //if there are events in queue run them
 }
 
 //void MainWindow::ACQUdirChanged(QString path)
@@ -358,6 +365,7 @@ void MainWindow::ForceRunGoAT()
         QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
     }
 
+    FinishedACQUFiles.push_back(this->curFile);
     tabLog->AppendTextNL("Force Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
     process->start(configGUI.getGoATExe().c_str(), *arguments);
 
@@ -381,9 +389,20 @@ void MainWindow::newGoatFile()
     tabLog->AppendTextNL("GoAT Error Stream", p_stderr.toStdString());
 
 
-    // NEED to get GOAT file name to display it.
-    //this->tabRunByRun->updateRootFile(curFile.c_str());
-    //this->tabRunByRun->updateAllGraphics();
+    tabRunByRun->updateRootFile("/home/august/a2GoAT/Acqu_Compton_355.root");
+    tabRunByRun->updateAllGraphics();
+
+    // save to file
+    configGUI.writeGUIConfigFile();
+
+    if (!this->ACQUFilesQueue.empty())
+    {
+        this->curFile = this->ACQUFilesQueue[0];
+        this->ACQUFilesQueue.erase(ACQUFilesQueue.begin());
+        tabLog->setLabelLastACQU(this->curFile);
+        configGUI.setLastACQUFile(this->curFile);
+        RunGoat();
+    }
 }
 
 void MainWindow::on_actionEdig_config_file_triggered()

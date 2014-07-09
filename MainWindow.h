@@ -40,13 +40,14 @@ public:
 private:
     bool continueScanning;
     std::vector<std::string> ACQUFilesQueue;
-
+    std::vector<std::string> FinishedACQUFiles;
 
     Ui::MainWindow *ui;
 
     QFuture<void> future;
     void FileChecker();
     void RunGoat();
+    void TakeANap(int ms);
 
     ConfigurationDialog *configurationDialog;
 

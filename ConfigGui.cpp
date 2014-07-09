@@ -36,6 +36,10 @@ void ConfigGUI::PrintAll()
     std::cout << this->LastGoATFile << std::endl;
 }
 
+void ConfigGUI::setConfigFilePath(std::string str){
+    this->ConfigFilePath = str;
+}
+
 bool ConfigGUI::loadGUIConfigFile(std::string config_file)
 {
     ifstream cfile(config_file.c_str());
