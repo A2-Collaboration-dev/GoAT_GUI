@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(process, SIGNAL(finished(int)), this, SLOT(newGoatFile()));
 
 
-    //connect(tabLog->)
+    connect(tabLog->getButtonRunGoAT(), SIGNAL(clicked()), this, SLOT(ForceRunGoAT()));
     this->tabLog->AppendTextNL("GUI Initialized.");
 }
 
@@ -102,8 +102,7 @@ void MainWindow::ACQUdirChanged(QString path)
   std::cout << "ACQUdirChanged method called." << std::endl;
   int MaxContinueAttempts = 5;
 
-  std::cout << continueScanning << std::endl;
-  std::cout << OpeningAtempt << std::endl;
+
   if (this->continueScanning)
   {
       if (this->OpeningAtempt >= MaxContinueAttempts)
@@ -133,7 +132,7 @@ void MainWindow::ACQUdirChanged(QString path)
                      << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
           /*
-           * Experimental
+           * Checking if file is in use (usually working)
            */
 
           TFile *file_in = TFile::Open(this->curFile.c_str());
@@ -177,6 +176,39 @@ void MainWindow::ACQUdirChanged(QString path)
   }
 }
 
+void MainWindow::ForceRunGoAT()
+{
+    if (process->state() != QProcess::NotRunning)
+    {
+        tabLog->AppendText1L("Error: ", "DarkMagenta", "GoAT process is already running.");
+        return;
+    }
+
+    *arguments << "-f" << this->curFile.c_str()
+               << "-D" << configGUI.getGoATDir().c_str()
+               << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
+
+    TFile *file_in = TFile::Open(this->curFile.c_str());
+    if(!file_in)
+    {
+        tabLog->AppendTextNL("Could not open file " + this->curFile);
+        return;
+    }
+    file_in->Close();
+
+    this->continueScanning = false;
+    this->OpeningAtempt = 0;
+
+    QTime dieTime = QTime::currentTime().addMSecs( 500 );
+    while( QTime::currentTime() < dieTime )
+    {
+        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+    }
+
+    tabLog->AppendTextNL("Force Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
+    process->start(configGUI.getGoATExe().c_str(), *arguments);
+
+}
 
 void MainWindow::newGoatFile()
 {

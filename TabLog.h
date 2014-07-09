@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTime>
 #include <iostream>
+#include <QPushButton>
 
 namespace Ui {
 class TabLog;
@@ -28,6 +29,9 @@ public:
 
     void setLabelLastACQU(std::string);
     void setCurrentGoAT(std::string);
+
+    QPushButton* getButtonRunGoAT();
+
 private:
     Ui::TabLog *ui;
 };

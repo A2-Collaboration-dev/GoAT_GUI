@@ -7,7 +7,6 @@ TabLog::TabLog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->textBrowser->setAcceptRichText(true);
-
 }
 
 TabLog::~TabLog()
@@ -67,4 +66,9 @@ std::string TabLog::Color(std::string str, char* color)
 std::string TabLog::ColorB(std::string str, char* color)
 {
     return Bold(Color(str, color));
+}
+
+QPushButton* TabLog::getButtonRunGoAT()
+{
+    return ui->buttonForceRunGoAT;
 }

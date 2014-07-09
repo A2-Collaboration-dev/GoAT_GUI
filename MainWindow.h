@@ -66,7 +66,7 @@ private slots:
 
   void ACQUdirChanged(QString path);
   void newGoatFile();
-
+  void ForceRunGoAT();
   void on_actionEdig_config_file_triggered();
 };
 
