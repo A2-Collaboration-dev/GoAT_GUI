@@ -39,11 +39,14 @@ public:
 
 private:
     bool continueScanning;
+    std::vector<std::string> ACQUFilesQueue;
+
 
     Ui::MainWindow *ui;
 
     QFuture<void> future;
     void FileChecker();
+    void RunGoat();
 
     ConfigurationDialog *configurationDialog;
 
@@ -67,6 +70,7 @@ private slots:
   void ACQUdirChanged(QString path);
   void newGoatFile();
   void ForceRunGoAT();
+  void killGoatProcess();
   void on_actionEdig_config_file_triggered();
 };
 

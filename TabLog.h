@@ -31,6 +31,7 @@ public:
     void setCurrentGoAT(std::string);
 
     QPushButton* getButtonRunGoAT();
+    QPushButton* getButtonKillGoAT();
 
 private:
     Ui::TabLog *ui;

@@ -72,3 +72,8 @@ QPushButton* TabLog::getButtonRunGoAT()
 {
     return ui->buttonForceRunGoAT;
 }
+
+QPushButton* TabLog::getButtonKillGoAT()
+{
+    return ui->buttonKillGoAT;
+}
