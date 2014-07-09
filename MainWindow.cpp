@@ -50,6 +50,13 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     /*
+     * Setting labels
+     */
+    tabLog->setLabelLastACQU(configGUI.getLastFile());
+    tabLog->setCurrentGoAT(configGUI.getLastGoATFile());
+
+
+    /*
      * Using QFileSystemWatcher to check if ACQU directory was updated
      */
     this->curFile = this->configGUI.getLastFile();
@@ -67,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(process, SIGNAL(finished(int)), this, SLOT(newGoatFile()));
 
 
+    //connect(tabLog->)
     this->tabLog->AppendTextNL("GUI Initialized.");
 }
 
@@ -92,19 +100,27 @@ void MainWindow::FileChecker()
 void MainWindow::ACQUdirChanged(QString path)
 {
   std::cout << "ACQUdirChanged method called." << std::endl;
+  int MaxContinueAttempts = 5;
 
   std::cout << continueScanning << std::endl;
   std::cout << OpeningAtempt << std::endl;
   if (this->continueScanning)
   {
-      if (this->OpeningAtempt >= 5)
+      if (this->OpeningAtempt >= MaxContinueAttempts)
+      {
+          tabLog->AppendText1L("File Error: ", "DarkMagenta", "Could not open " + this->curFile + ". Possible causes: file is still being copied or is corrupted.");
+          this->OpeningAtempt = 0;
+          this->continueScanning = true;
           return;
+      }
 
       std::string newFile = getNewestFile(configGUI.getACQUDir(), "*.root");
 
       if ((newFile != curFile && newFile != "") || OpeningAtempt > 0)
       {
           this->curFile = newFile;
+          tabLog->setLabelLastACQU(this->curFile);
+          configGUI.setLastACQUFile(this->curFile);
 
           if (this->OpeningAtempt == 0)
             tabLog->AppendTextNL("New file detected: " + this->curFile);
@@ -123,10 +139,15 @@ void MainWindow::ACQUdirChanged(QString path)
           TFile *file_in = TFile::Open(this->curFile.c_str());
           if(!file_in)
           {
-              tabLog->AppendTextNL("File is being accessed by another program, trying again in 5 seconds.");
+              tabLog->AppendTextNL("File is being accessed by another program, trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
               std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
 
-              std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+              QTime dieTime = QTime::currentTime().addMSecs( 10000 );
+              while( QTime::currentTime() < dieTime )
+              {
+                  QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+              }
+              //std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
               this->OpeningAtempt++;
               this->ACQUdirChanged(path);
@@ -134,25 +155,23 @@ void MainWindow::ACQUdirChanged(QString path)
           }
           file_in->Close();
 
-          std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+          //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-          /*
-          std::ifstream ifs(this->curFile);
-          if (!ifs)
+          this->continueScanning = false;
+          this->OpeningAtempt = 0;
+          std::cout << "stop scanning" << std::endl;
+
+          QTime dieTime = QTime::currentTime().addMSecs( 5000 );
+          while( QTime::currentTime() < dieTime )
           {
-              tabLog->AppendTextNL("Input stream seems to be associated with: " + this->curFile);
-              std::cout << "bla bla stream error " << std::endl;
-              return;
+              QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
           }
-          */
 
-              tabLog->AppendTextNL("Starting <b>GoAT</b> with " + this->curFile);
-              //process->setWorkingDirectory("/home/august/a2GoAT/");
-              process->start(configGUI.getGoATExe().c_str(), *arguments);
+          tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
+          //process->setWorkingDirectory("/home/august/a2GoAT/");
+          process->start(configGUI.getGoATExe().c_str(), *arguments);
 
-              this->continueScanning = false;
-              this->OpeningAtempt = 0;
-              std::cout << "stop scanning" << std::endl;
+
 
       }
   }

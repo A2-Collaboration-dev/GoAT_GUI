@@ -28,6 +28,10 @@ public:
     std::string getGoATDir();
     std::string getPhysicsDir();
     std::string getLastFile();
+    std::string getLastGoATFile();
+
+    void setLastFile(std::string);
+    void setLastGoATFile(std::string);
 
     void setLastACQUFile(std::string file);
 
@@ -42,6 +46,7 @@ private:
     std::string GoAT_Dir;
     std::string Physics_Dir;
     std::string LastFile;
+    std::string LastGoATFile;
 
 };
 

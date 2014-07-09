@@ -184,6 +184,7 @@ void ConfigurationDialog::on_pushButton_clicked()
 {
     configGUI.writeGUIConfigFile(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/settings.gui"));
     configFile.writeGoATConfigFile(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat"));
+    this->close();
 }
 
 void ConfigurationDialog::on_pushButtonPRCBProtons_clicked()

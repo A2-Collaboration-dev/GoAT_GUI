@@ -81,15 +81,15 @@ void TabRunByRun::updateAllGraphics()
 void TabRunByRun::on_pushButtonZoomIn_clicked()
 {
     ui->scrollArea->setWidgetResizable(false);
-    ui->widget->resize(ui->widget->size() + QSize(150, 150));
-    ui->scrollAreaWidgetContents->resize(ui->widget->size() + QSize(150, 150));
+    ui->widget->resize(ui->widget->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents->resize(ui->widget->size() + QSize(150, 0));
 }
 
 void TabRunByRun::on_pushButtonZoomOut_clicked()
 {
     ui->scrollArea->setWidgetResizable(false);
-    ui->widget->resize(ui->widget->size() - QSize(150, 150));
-    ui->scrollAreaWidgetContents->resize(ui->widget->size() - QSize(150, 150));
+    ui->widget->resize(ui->widget->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents->resize(ui->widget->size() + QSize(0, 150));
 }
 
 void TabRunByRun::on_pushButton_clicked()
@@ -172,41 +172,41 @@ void TabRunByRun::on_buttonTaps3R_clicked()
 void TabRunByRun::on_buttonTaps1Plus_clicked()
 {
     ui->scrollArea_2->setWidgetResizable(false);
-    ui->widgetTaps1->resize(ui->widgetTaps1->size() + QSize(150, 150));
-    ui->scrollAreaWidgetContents_2->resize(ui->widgetTaps1->size() + QSize(150, 150));
+    ui->widgetTaps1->resize(ui->widgetTaps1->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_2->resize(ui->widgetTaps1->size() + QSize(150, 0));
 }
 
 void TabRunByRun::on_buttonTaps2Plus_clicked()
 {
     ui->scrollArea_3->setWidgetResizable(false);
-    ui->widgetTaps2->resize(ui->widgetTaps2->size() + QSize(150, 150));
-    ui->scrollAreaWidgetContents_3->resize(ui->widgetTaps2->size() + QSize(150, 150));
+    ui->widgetTaps2->resize(ui->widgetTaps2->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_3->resize(ui->widgetTaps2->size() + QSize(150, 0));
 }
 
 void TabRunByRun::on_buttonTaps3Plus_clicked()
 {
     ui->scrollArea_4->setWidgetResizable(false);
-    ui->widgetTaps3->resize(ui->widgetTaps3->size() + QSize(150, 150));
-    ui->scrollAreaWidgetContents_4->resize(ui->widgetTaps3->size() + QSize(150, 150));
+    ui->widgetTaps3->resize(ui->widgetTaps3->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_4->resize(ui->widgetTaps3->size() + QSize(150, 0));
 }
 
 void TabRunByRun::on_buttonTaps1Minus_clicked()
 {
     ui->scrollArea_2->setWidgetResizable(false);
-    ui->widgetTaps1->resize(ui->widgetTaps1->size() - QSize(150, 150));
-    ui->scrollAreaWidgetContents_2->resize(ui->widgetTaps1->size() - QSize(150, 150));
+    ui->widgetTaps1->resize(ui->widgetTaps1->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_2->resize(ui->widgetTaps1->size() + QSize(0, 150));
 }
 
 void TabRunByRun::on_buttonTaps2Minus_clicked()
 {
     ui->scrollArea_3->setWidgetResizable(false);
-    ui->widgetTaps2->resize(ui->widgetTaps2->size() - QSize(150, 150));
-    ui->scrollAreaWidgetContents_3->resize(ui->widgetTaps2->size() - QSize(150, 150));
+    ui->widgetTaps2->resize(ui->widgetTaps2->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_3->resize(ui->widgetTaps2->size() + QSize(0, 150));
 }
 
 void TabRunByRun::on_buttonTaps3Minus_clicked()
 {
     ui->scrollArea_4->setWidgetResizable(false);
-    ui->widgetTaps3->resize(ui->widgetTaps3->size() - QSize(150, 150));
-    ui->scrollAreaWidgetContents_4->resize(ui->widgetTaps3->size() - QSize(150, 150));
+    ui->widgetTaps3->resize(ui->widgetTaps3->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_4->resize(ui->widgetTaps3->size() + QSize(0, 150));
 }

@@ -20,9 +20,14 @@ public:
     void AppendTextNL(std::string str);
     void AppendTextNL(std::string title, std::string str);
     void AppendTextNL(std::string title, char* color, std::string str);
+    void AppendText1L(std::string title, char* color, std::string str);
 
-    std::string Bold(std::string str);
-    std::string Color(std::string, char *color);
+    static std::string Bold(std::string str);
+    static std::string Color(std::string, char *color);
+    static std::string ColorB(std::string, char *color);
+
+    void setLabelLastACQU(std::string);
+    void setCurrentGoAT(std::string);
 private:
     Ui::TabLog *ui;
 };

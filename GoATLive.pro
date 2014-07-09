@@ -11,6 +11,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = GoATLive
 TEMPLATE = app
 
+DESTDIR=bin #Target file directory
+OBJECTS_DIR=generated_files #Intermediate object files directory
+MOC_DIR=generated_files #Intermediate moc files directory
 
 SOURCES += main.cpp\
     MainWindow.cpp \
@@ -42,3 +45,6 @@ FORMS    += \
 include("$(ROOTSYS)/include/rootcint.pri")
 
 QMAKE_CXXFLAGS += -std=c++0x
+
+RESOURCES += \
+    Resources.qrc

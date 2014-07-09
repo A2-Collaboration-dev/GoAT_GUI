@@ -719,7 +719,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Start</string>
+                <string>Save</string>
                </property>
               </widget>
              </item>

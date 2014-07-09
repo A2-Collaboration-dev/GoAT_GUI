@@ -10,6 +10,7 @@ ConfigGUI::ConfigGUI()
     GoAT_Dir = nullValue;
     LastFile = nullValue;
     Physics_Dir = nullValue;
+    LastGoATFile = nullValue;
 }
 
 void ConfigGUI::PrintAll()
@@ -20,6 +21,7 @@ void ConfigGUI::PrintAll()
     std::cout << this->GoAT_Dir << std::endl;
     std::cout << this->Physics_Dir << std::endl;
     std::cout << this->LastFile << std::endl;
+    std::cout << this->LastGoATFile << std::endl;
 }
 
 bool ConfigGUI::loadGUIConfigFile(std::string config_file)
@@ -37,6 +39,7 @@ bool ConfigGUI::loadGUIConfigFile(std::string config_file)
     this->GoAT_Dir = ReadConfig("GoAT-Dir",0,(Char_t*)config_file.c_str());
     this->Physics_Dir = ReadConfig("Physics-Dir",0,(Char_t*)config_file.c_str());
     this->LastFile = ReadConfig("LastFile",0,(Char_t*)config_file.c_str());
+    this->LastGoATFile = ReadConfig("LastGoATFile",0,(Char_t*)config_file.c_str());
 
     return true;
 }
@@ -68,6 +71,8 @@ void ConfigGUI::writeGUIConfigFile(const std::string filename)
         outputData.append("Physics-Dir: ").append(this->Physics_Dir).append("\n");
     if (this->LastFile != nullValue)
         outputData.append("LastFile: ").append(this->LastFile).append("\n");
+    if (this->LastGoATFile != nullValue)
+        outputData.append("LastGoATFile: ").append(this->LastGoATFile).append("\n");
 
     outfile.write (outputData.c_str(),outputData.size());
     outfile.close();
@@ -163,4 +168,9 @@ std::string ConfigGUI::getPhysicsDir()
 std::string ConfigGUI::getLastFile()
 {
     return this->LastFile;
+}
+
+std::string ConfigGUI::getLastGoATFile()
+{
+    return this->LastGoATFile;
 }

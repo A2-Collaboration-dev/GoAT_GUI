@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>data/arrow_down.png</file>
+        <file>data/forward.png</file>
+        <file>data/view_refresh.png</file>
+    </qresource>
+</RCC>
