@@ -25,6 +25,10 @@
 #include <TROOT.h>
 #include <QFuture>
 
+#include <QWaitCondition>
+#include <QMutex>
+
+
 namespace Ui {
 class MainWindow;
 }
@@ -67,6 +71,11 @@ private:
     QStringList* arguments;
 
     int OpeningAtempt;
+
+    /* Test */
+    QWaitCondition waitCondition;
+    QMutex mutex;
+
 
 private slots:
 

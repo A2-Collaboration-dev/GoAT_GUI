@@ -8,6 +8,17 @@
 #include <chrono>
 #include <thread>
 
+#include <QFileInfo>
+
+class Thread : public QThread
+{
+public:
+    static void msleep(int ms)
+    {
+        QThread::msleep(ms);
+    }
+};
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -79,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tabLog->getButtonKillGoAT(), SIGNAL(clicked()), this, SLOT(killGoatProcess()));
 
     this->tabLog->AppendTextNL("GUI Initialized.");
+
 }
 
 MainWindow::~MainWindow()
@@ -151,7 +163,7 @@ void MainWindow::ACQUdirChanged(QString path)
             // if the file is really new never been in the list
             if(!(std::find(ACQUFilesQueue.begin(), ACQUFilesQueue.end(), newFile) != ACQUFilesQueue.end())) {
                 ACQUFilesQueue.push_back(newFile);
-                tabLog->AppendTextNL(TabLog::ColorB("GoAT", "BlueViolet") + " is already running. File added to queue: " + TabLog::Color(newFile, "DarkOliveGreen"));
+                tabLog->AppendTextNL(TabLog::ColorB("GoAT", "BlueViolet") + " is already running. File added to queue: " + TabLog::Color(newFile, "DarkOliveGreen")  + " [" + std::to_string(ACQUFilesQueue.size()) + "]");
                 std::cout << "file in queue" + newFile << std::endl;
             }
         }
@@ -175,8 +187,6 @@ void MainWindow::RunGoat()
         return;
     }
 
-    this->continueScanning = false;
-
     *arguments << "-f" << this->curFile.c_str()
                << "-D" << configGUI.getGoATDir().c_str()
                << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
@@ -185,19 +195,31 @@ void MainWindow::RunGoat()
      * Checking if file is in use (usually working)
      */
 
-    TFile *file_in = TFile::Open(this->curFile.c_str(), "READ");
-    if(!file_in)
+    QFileInfo qfile(this->curFile.c_str());
+    if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-1))
     {
         tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
         std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
 
         TakeANap(5000);
-
         this->OpeningAtempt++;
         this->RunGoat();
         return;
     }
-    file_in->Close();
+
+//    TFile *file_in = TFile::Open(this->curFile.c_str(), "READ");
+//    if(!file_in)
+//    {
+//        tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
+//        std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
+
+//        TakeANap(5000);
+
+//        this->OpeningAtempt++;
+//        this->RunGoat();
+//        return;
+//    }
+//    file_in->Close();
 
     this->OpeningAtempt = 0;
     std::cout << "stop scanning" << std::endl;
@@ -213,9 +235,14 @@ void MainWindow::RunGoat()
 
 void MainWindow::TakeANap(int ms)
 {
+    // Would be nice, but in different thread.
+    //waitCondition.wait(&mutex, ms);
+    //return;
+
     QTime dieTime = QTime::currentTime().addMSecs( ms );
     while( QTime::currentTime() < dieTime )
     {
+        waitCondition.wait(&mutex, 100);
         QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
     }
 }
@@ -302,5 +329,5 @@ void MainWindow::killGoatProcess()
 {
     std::cout << "process kill" << std::endl;
     process->kill();
-    process->close();
+    //process->close();
 }

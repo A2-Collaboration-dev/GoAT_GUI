@@ -7,10 +7,13 @@ TabLog::TabLog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->textBrowser->setAcceptRichText(true);
-    LogFileName = QDate::currentDate().toString().toStdString() + QTime::currentTime().toString().toStdString();
+    date = QDate::currentDate();
+
+    LogFileName = date.toString("yyyy MM dd - ").toStdString() + QTime::currentTime().toString().toStdString();
 
 
     connect(ui->textBrowser, SIGNAL(textChanged()), this, SLOT(WriteLogToFile()));
+
 }
 
 TabLog::~TabLog()

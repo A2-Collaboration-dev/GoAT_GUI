@@ -5,7 +5,10 @@
 #include <QTime>
 #include <iostream>
 #include <QPushButton>
-#include<fstream>
+#include <fstream>
+
+
+#include <QMovie>
 
 namespace Ui {
 class TabLog;
@@ -39,6 +42,9 @@ public:
 private:
     Ui::TabLog *ui;
     std::string LogFileName;
+
+    QDate date;
+    QTime time;
 
 private slots:
     void WriteLogToFile();
