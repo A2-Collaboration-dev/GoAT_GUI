@@ -10,15 +10,6 @@
 
 #include <QFileInfo>
 
-class Thread : public QThread
-{
-public:
-    static void msleep(int ms)
-    {
-        QThread::msleep(ms);
-    }
-};
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -81,9 +72,11 @@ MainWindow::MainWindow(QWidget *parent) :
     /*
      * Signal of when GoAT is finished
      */
-    this->process = new QProcess(this);
-    this->arguments = new QStringList;
-    connect(process, SIGNAL(finished(int)), this, SLOT(newGoatFile()));
+    this->GoATProcess = new QProcess(this);
+    this->GoATarguments = new QStringList;
+    connect(GoATProcess, SIGNAL(finished(int)), this, SLOT(newGoatFile()));
+
+    this->PhysicsProcess = new QProcess(this);
 
 
     connect(tabLog->getButtonRunGoAT(), SIGNAL(clicked()), this, SLOT(ForceRunGoAT()));
@@ -96,9 +89,9 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     continueScanning = false;
-    process->kill();
-    process->close();
-    delete process;
+    GoATProcess->kill();
+    GoATProcess->close();
+    delete GoATProcess;
     delete ui;
 }
 
@@ -127,7 +120,7 @@ void MainWindow::ACQUdirChanged(QString path)
 
     if ((newFile != this->curFile && newFile != "") || OpeningAtempt > 0)
     {
-        if (this->process->state() == QProcess::NotRunning)
+        if (this->GoATProcess->state() == QProcess::NotRunning)
         {
             /* Attempt to open the file that was being used by another program */
             if (this->OpeningAtempt > 0)
@@ -174,7 +167,7 @@ void MainWindow::ACQUdirChanged(QString path)
 
 void MainWindow::RunGoat()
 {
-    if (this->process->state() != QProcess::NotRunning)
+    if (this->GoATProcess->state() != QProcess::NotRunning)
         return;
 
     int MaxContinueAttempts = 5;
@@ -187,7 +180,7 @@ void MainWindow::RunGoat()
         return;
     }
 
-    *arguments << "-f" << this->curFile.c_str()
+    *GoATarguments << "-f" << this->curFile.c_str()
                << "-D" << configGUI.getGoATDir().c_str()
                << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
@@ -196,7 +189,7 @@ void MainWindow::RunGoat()
      */
 
     QFileInfo qfile(this->curFile.c_str());
-    if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-1))
+    if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-5))
     {
         tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
         std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
@@ -229,16 +222,12 @@ void MainWindow::RunGoat()
 
     tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
 
-    if (this->process->state() == QProcess::NotRunning)
-        process->start(configGUI.getGoATExe().c_str(), *arguments);
+    if (this->GoATProcess->state() == QProcess::NotRunning)
+        GoATProcess->start(configGUI.getGoATExe().c_str(), *GoATarguments);
 }
 
 void MainWindow::TakeANap(int ms)
 {
-    // Would be nice, but in different thread.
-    //waitCondition.wait(&mutex, ms);
-    //return;
-
     QTime dieTime = QTime::currentTime().addMSecs( ms );
     while( QTime::currentTime() < dieTime )
     {
@@ -250,13 +239,13 @@ void MainWindow::TakeANap(int ms)
 
 void MainWindow::ForceRunGoAT()
 {
-    if (process->state() != QProcess::NotRunning)
+    if (GoATProcess->state() != QProcess::NotRunning)
     {
         tabLog->AppendText1L("<b>Error:</b> ", "DarkMagenta", TabLog::ColorB("GoAT", "BlueViolet") + " process is already running.");
         return;
     }
 
-    *arguments << "-f" << this->curFile.c_str()
+    *GoATarguments << "-f" << this->curFile.c_str()
                << "-D" << configGUI.getGoATDir().c_str()
                << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
@@ -279,15 +268,15 @@ void MainWindow::ForceRunGoAT()
 
     FinishedACQUFiles.push_back(this->curFile);
     tabLog->AppendTextNL("Force Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
-    process->start(configGUI.getGoATExe().c_str(), *arguments);
+    GoATProcess->start(configGUI.getGoATExe().c_str(), *GoATarguments);
 
 }
 
 void MainWindow::newGoatFile()
 {
-    QString p_stdout = process->readAllStandardOutput();
-    QString p_stderr = process->readAllStandardError();
-    QString pa = process->readAll();
+    QString p_stdout = GoATProcess->readAllStandardOutput();
+    QString p_stderr = GoATProcess->readAllStandardError();
+    QString pa = GoATProcess->readAll();
 
     std::cout << "Output: \n" << p_stdout.toStdString() << std::endl;
     std::cout << "Error: \n" << p_stderr.toStdString() << std::endl;
@@ -327,7 +316,6 @@ void MainWindow::on_actionEdig_config_file_triggered()
 
 void MainWindow::killGoatProcess()
 {
-    std::cout << "process kill" << std::endl;
-    process->kill();
-    //process->close();
+    std::cout << "GoATProcess kill" << std::endl;
+    GoATProcess->kill();
 }

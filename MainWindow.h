@@ -67,9 +67,10 @@ private:
 
     std::string curFile;
 
-    QProcess* process;
-    QStringList* arguments;
+    QProcess* GoATProcess;
+    QStringList* GoATarguments;
 
+    QProcess* PhysicsProcess;
     int OpeningAtempt;
 
     /* Test */
