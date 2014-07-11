@@ -88,7 +88,9 @@ private slots:
   void newGoatFile();
   void newPhysicsFile();
   void ForceRunGoAT();
+  void ForceRunPhysics();
   void killGoatProcess();
+  void killPhysicsProcess();
   void on_actionEdig_config_file_triggered();
   void RunGoat();
 };

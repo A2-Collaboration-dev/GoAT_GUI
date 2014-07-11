@@ -212,7 +212,7 @@ void MainWindow::RunGoat()
     QFileInfo qfile(this->curFile.c_str());
 
     /* Check if files was modified in 5 seconds, else use it */
-    if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-5))
+    if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-20))
     {
         tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
         std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
@@ -253,33 +253,35 @@ void MainWindow::ForceRunGoAT()
         return;
     }
 
-    *GoATarguments << "-f" << this->curFile.c_str()
-                   << "-D" << configGUI.getGoATDir().c_str()
-                   << "-p" << "Acqu_"
-                   << "-P" << "GoATX"
-                   << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
-
-    TFile *file_in = TFile::Open(this->curFile.c_str());
-    if(!file_in)
+    if (PhysicsProcess->state() != QProcess::NotRunning)
     {
-        tabLog->AppendTextNL("Could not open file " + this->curFile);
+        tabLog->AppendText1L("<b>Error:</b> ", "DarkMagenta", TabLog::ColorB("Physics Analysis", "RoyalBlue ") + " process is already running.");
         return;
     }
-    file_in->Close();
 
-    this->continueScanning = false;
-    this->OpeningAtempt = 0;
+    this->curFile = tabLog->getLabelACQU();
+    this->RunGoat();
+}
 
-    QTime dieTime = QTime::currentTime().addMSecs( 2000 );
-    while( QTime::currentTime() < dieTime )
+void MainWindow::ForceRunPhysics()
+{
+    if (GoATProcess->state() != QProcess::NotRunning)
     {
-        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+        tabLog->AppendText1L("<b>Error:</b> ", "DarkMagenta", TabLog::ColorB("GoAT", "BlueViolet") + " process is already running.");
+        return;
     }
 
-    FinishedACQUFiles.push_back(this->curFile);
-    tabLog->AppendTextNL("Force Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
-    GoATProcess->start(configGUI.getGoATExe().c_str(), *GoATarguments);
+    if (PhysicsProcess->state() != QProcess::NotRunning)
+    {
+        tabLog->AppendText1L("<b>Error:</b> ", "DarkMagenta", TabLog::ColorB("Physics Analysis", "RoyalBlue ") + " process is already running.");
+        return;
+    }
+    //QString tempTrick(tabLog->getLabelGoAT().c_str());
+   // tempTrick = tempTrick.replace(configGUI.getGoATConfig(), configGUI.getACQUPrefix());
 
+   // this->curFile = tempTrick.toStdString();
+    //may cause bugs if
+   // this->RunGoat();
 }
 
 void MainWindow::newGoatFile()
@@ -394,4 +396,10 @@ void MainWindow::killGoatProcess()
 {
     std::cout << "GoATProcess kill" << std::endl;
     GoATProcess->kill();
+}
+
+void MainWindow::killPhysicsProcess()
+{
+    std::cout << "PhysicsProcess kill" << std::endl;
+    PhysicsProcess->kill();
 }

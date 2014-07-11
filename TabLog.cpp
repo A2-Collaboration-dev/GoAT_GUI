@@ -87,6 +87,21 @@ std::string TabLog::ColorB(std::string str, char* color)
     return Bold(Color(str, color));
 }
 
+std::string TabLog::getLabelACQU()
+{
+    return ui->labelLastACQU->text().toStdString();
+}
+
+std::string TabLog::getLabelGoAT()
+{
+    return ui->labelCurrentGoat->text().toStdString();
+}
+
+std::string TabLog::getLabelPhys()
+{
+    return ui->labelLastPhysics->text().toStdString();
+}
+
 QPushButton* TabLog::getButtonRunGoAT()
 {
     return ui->buttonForceRunGoAT;

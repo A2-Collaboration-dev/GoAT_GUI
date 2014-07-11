@@ -29,6 +29,10 @@ public:
     void AppendText1L(char*, char* color, std::string str);
 
 
+    std::string getLabelACQU();
+    std::string getLabelGoAT();
+    std::string getLabelPhys();
+
     static std::string Bold(std::string str);
     static std::string Color(std::string, char *color);
     static std::string ColorB(std::string, char *color);
