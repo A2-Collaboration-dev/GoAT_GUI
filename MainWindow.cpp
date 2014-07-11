@@ -59,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
      */
     tabLog->setLabelLastACQU(configGUI.getLastFile());
     tabLog->setLabelLastGoAT(configGUI.getLastGoATFile());
+    tabLog->setLabelLastPhys(configGUI.getLastPhysFile());
 
 
     /*
@@ -91,6 +92,8 @@ MainWindow::MainWindow(QWidget *parent) :
      */
     connect(tabLog->getButtonRunGoAT(), SIGNAL(clicked()), this, SLOT(ForceRunGoAT()));
     connect(tabLog->getButtonKillGoAT(), SIGNAL(clicked()), this, SLOT(killGoatProcess()));
+    connect(tabLog->getButtonRunPhys(), SIGNAL(clicked()), this, SLOT(ForceRunPhysics()));
+    connect(tabLog->getButtonKillPhys(), SIGNAL(clicked()), this, SLOT(killPhysicsProcess()));
 
     this->tabLog->AppendTextNL("GUI Initialized.");
 
@@ -276,12 +279,9 @@ void MainWindow::ForceRunPhysics()
         tabLog->AppendText1L("<b>Error:</b> ", "DarkMagenta", TabLog::ColorB("Physics Analysis", "RoyalBlue ") + " process is already running.");
         return;
     }
-    //QString tempTrick(tabLog->getLabelGoAT().c_str());
-   // tempTrick = tempTrick.replace(configGUI.getGoATConfig(), configGUI.getACQUPrefix());
 
-   // this->curFile = tempTrick.toStdString();
-    //may cause bugs if
-   // this->RunGoat();
+    this->curFile = this->configGUI.getLastFile();
+    this->newGoatFile();
 }
 
 void MainWindow::newGoatFile()
@@ -290,15 +290,15 @@ void MainWindow::newGoatFile()
     QString p_stderr = GoATProcess->readAllStandardError();
     QString pa = GoATProcess->readAll();
 
-    //std::cout << "Output: \n" << p_stdout.toStdString() << std::endl;
-    //std::cout << "Error: \n" << p_stderr.toStdString() << std::endl;
-    //std::cout << pa.toStdString() << std::endl;
-    std::cout << "finished" << std::endl;
 
     //this->continueScanning = true;
     this->OpeningAtempt = 0;
-    tabLog->AppendTextNL("GoAT Output Stream", p_stdout.toStdString());
-    tabLog->AppendTextNL("GoAT Error Stream", p_stderr.toStdString());
+
+    if (!p_stdout.isEmpty())
+    {
+        tabLog->AppendTextNL("GoAT Output Stream", p_stdout.toStdString());
+        tabLog->AppendTextNL("GoAT Error Stream", p_stderr.toStdString());
+    }
 
     // Only storing changes of files that were used in computation
     configGUI.writeGUIConfigFile();

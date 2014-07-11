@@ -16,6 +16,7 @@
 #include <QtConcurrentRun>
 #include <stdlib.h>
 
+
 static void getNamesList(std::string lookfor, std::vector<std::string> &pass, std::string config)
 {
     bool keepLooking = false;
@@ -85,7 +86,7 @@ static std::string getNewestFile(std::string iDirIn, char* extension)
     dir.setCurrent(iDir);
 
     QStringList filters;
-    filters << "*.root";
+    filters << extension;
     dir.setNameFilters(filters);
 
     QFileInfoList list = dir.entryInfoList();

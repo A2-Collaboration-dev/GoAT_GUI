@@ -68,6 +68,7 @@ private:
     QFileSystemWatcher * watcher;
 
     std::string curFile;
+    std::string ACQUFile;
 
     QProcess* GoATProcess;
     QStringList* GoATarguments;
