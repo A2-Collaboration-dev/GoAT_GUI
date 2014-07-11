@@ -11,9 +11,18 @@ TabRunByRun::TabRunByRun(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    file    = TFile::Open("/home/august/a2GoAT/Acqu_Compton_355.root");
-    if(!file)
+    if (!configGUI.loadGUIConfigFile(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/settings.gui")))
+    {
+        std::cout << "GUI Config file not found at: " <<
+                     QCoreApplication::applicationDirPath().toStdString() + std::string("/config/settings.gui") << std::endl;
         return;
+    }
+
+    this->file = new TFile;
+    this->PhysicsFile = new TFile;
+
+    this->updateRootFile(configGUI.getLastFile().c_str());
+
 
 
     ui->scrollArea->setMinimumWidth(800);
@@ -22,10 +31,7 @@ TabRunByRun::TabRunByRun(QWidget *parent) :
     // Only to initially resize Widget to fill the window
     ui->scrollArea->setWidgetResizable(true);
 
-    ui->widget->GetCanvas()->Clear();  //MyWidget is an instance of TQtWidget
-    ui->widget->GetCanvas()->Modified();
-    ui->widget->GetCanvas()->Update();
-
+    /*
     ui->widget->EnableSignalEvents(kMousePressEvent);
     ui->widget->EnableSignalEvents(kMouseMoveEvent);
     ui->widget->EnableSignalEvents(kMouseReleaseEvent);
@@ -33,6 +39,7 @@ TabRunByRun::TabRunByRun(QWidget *parent) :
     ui->widget->EnableSignalEvents(kKeyPressEvent);
     ui->widget->EnableSignalEvents(kEnterEvent);
     ui->widget->EnableSignalEvents(kLeaveEvent);
+    */
 
     /*
      * Filling TQtWidgets
@@ -40,14 +47,17 @@ TabRunByRun::TabRunByRun(QWidget *parent) :
 
 
     /* Detectors */
-    FillWidget(ui->widget, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
-    FillWidget(ui->widgetTaps1, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
-    FillWidget(ui->widgetTaps2, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
-    FillWidget(ui->widgetTaps3, std::string("TAPS3"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    //FillWidget(ui->widget, file, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    //FillWidget(ui->widgetTaps1, file, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    //FillWidget(ui->widgetTaps2, file, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    //FillWidget(ui->widgetTaps3, file, std::string("TAPS3"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
 
     /* Physics Analysis */
-    FillWidget(ui->widgetPA, std::string("PA"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    // file must exist
+    //FillWidget(ui->widgetPA, PhysicsFile, std::string("PA"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     //updateAllGraphics();
+
+    this->UpdateGraphicsDetectors();
 }
 
 TabRunByRun::~TabRunByRun()
@@ -56,26 +66,51 @@ TabRunByRun::~TabRunByRun()
     delete ui;
 }
 
-void TabRunByRun::updateRootFile(const char* file)
+void TabRunByRun::updateRootPhysicsFile(const char *ifile)
 {
-    this->file->Close();
-    this->file = TFile::Open("/home/august/a2GoAT/Acqu_Compton_355.root");
+    std::cout << "physics file updated" << std::endl;
+
+    if (this->PhysicsFile->IsOpen())
+        this->PhysicsFile->Close();
+
+    this->PhysicsFile = TFile::Open(ifile);
+    if (!this->PhysicsFile)
+        std::cout << "could not open physics file" << std::endl;
+}
+
+void TabRunByRun::UpdateGraphicsDetectors()
+{
+    FillWidget(ui->widget, file, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    FillWidget(ui->widgetTaps1, file, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    FillWidget(ui->widgetTaps2, file, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    FillWidget(ui->widgetTaps3, file, std::string("TAPS3"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+}
+
+void TabRunByRun::UpdateGraphicsPhysics()
+{
+    FillWidget(ui->widgetPA, PhysicsFile, std::string("PA"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+}
+
+void TabRunByRun::updateRootFile(const char* ifile)
+{
     std::cout << "root file updated "<< file << std::endl;
+
+    if (this->file->IsOpen())
+        this->file->Close();
+
+    this->file = TFile::Open(ifile);
     if(!this->file)
         std::cout << "not okay" << std::endl;
 
 }
 
-void TabRunByRun::updateAllGraphics()
+void TabRunByRun::UpdateAllGraphics()
 {
     /* Detectors */
-    FillWidget(ui->widget, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
-    FillWidget(ui->widgetTaps1, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
-    FillWidget(ui->widgetTaps2, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
-    FillWidget(ui->widgetTaps3, std::string("TAPS3"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    this->UpdateGraphicsDetectors();
 
     /* Physics Analysis */
-    FillWidget(ui->widgetPA, std::string("PA"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    this->UpdateGraphicsPhysics();
 }
 
 void TabRunByRun::on_pushButtonZoomIn_clicked()
@@ -96,14 +131,27 @@ void TabRunByRun::on_pushButton_clicked()
 {
     ui->widget->GetCanvas()->Clear();
     ui->scrollArea->setWidgetResizable(true);
-    FillWidget(ui->widget, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    FillWidget(ui->widget, file, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
 }
 
-void TabRunByRun::FillWidget(TQtWidget *Twidget, std::string detector, std::string filename)
+void TabRunByRun::FillWidget(TQtWidget *Twidget,TFile* tfile, std::string detector, std::string filename)
 {
     /*
      * Reading gui config file to specify the histograms
      */
+
+    if (!tfile)
+    {
+        std::cout << "!tfile" << std::endl;
+        return;
+    }
+
+    if (!tfile->IsOpen())
+    {
+        std::cout << "!IsOpen()" << std::endl;
+        return;
+    }
+
     std::ifstream ifs(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     if (!ifs)
     {
@@ -116,9 +164,6 @@ void TabRunByRun::FillWidget(TQtWidget *Twidget, std::string detector, std::stri
                          (std::istreambuf_iterator<char>()    ) );
 
     std::vector<std::string> histList;
-
-    if(!this->file)
-        return;
 
 
     Twidget->GetCanvas()->Clear();
@@ -136,7 +181,8 @@ void TabRunByRun::FillWidget(TQtWidget *Twidget, std::string detector, std::stri
     for(int i = 0; i < static_cast<int>(histList.size()); i++)
     {
         Twidget->cd(1 + i);
-        h2 = (TH2F*)file->Get(histList[i].c_str());
+            // ERROR MAY BE HERE
+        h2 = (TH2F*)tfile->Get(histList[i].c_str());
         if (h2 == nullptr)
             continue;
         h2->Draw();
@@ -150,14 +196,14 @@ void TabRunByRun::on_buttonTaps1R_clicked()
 {
     ui->widgetTaps1->GetCanvas()->Clear();
     ui->scrollArea_2->setWidgetResizable(true);
-    FillWidget(ui->widgetTaps1, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    FillWidget(ui->widgetTaps1,file, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
 }
 
 void TabRunByRun::on_buttonTaps2R_clicked()
 {
     ui->widgetTaps2->GetCanvas()->Clear();
     ui->scrollArea_3->setWidgetResizable(true);
-    FillWidget(ui->widgetTaps2, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    FillWidget(ui->widgetTaps2, file, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
 
 }
 
@@ -165,7 +211,7 @@ void TabRunByRun::on_buttonTaps3R_clicked()
 {
     ui->widgetTaps3->GetCanvas()->Clear();
     ui->scrollArea_4->setWidgetResizable(true);
-    FillWidget(ui->widgetTaps3, std::string("TAPS3"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    FillWidget(ui->widgetTaps3, file, std::string("TAPS3"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
 
 }
 

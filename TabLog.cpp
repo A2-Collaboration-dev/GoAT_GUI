@@ -62,7 +62,7 @@ void TabLog::setLabelLastACQU(std::string s)
     ui->labelLastACQU->setText(s.c_str());
 }
 
-void TabLog::setCurrentGoAT(std::string s)
+void TabLog::setLabelLastGoAT(std::string s)
 {
     ui->labelCurrentGoat->setText(s.c_str());
 }

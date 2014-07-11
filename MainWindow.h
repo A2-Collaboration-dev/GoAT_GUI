@@ -38,9 +38,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void setAbsolutePath(std::string);
+
 
 private:
     bool continueScanning;
@@ -71,6 +73,8 @@ private:
     QStringList* GoATarguments;
 
     QProcess* PhysicsProcess;
+    QStringList* PhysicsArguments;
+
     int OpeningAtempt;
 
     /* Test */
@@ -82,6 +86,7 @@ private slots:
 
   void ACQUdirChanged(QString path);
   void newGoatFile();
+  void newPhysicsFile();
   void ForceRunGoAT();
   void killGoatProcess();
   void on_actionEdig_config_file_triggered();

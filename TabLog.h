@@ -34,7 +34,7 @@ public:
     static std::string ColorB(std::string, char *color);
 
     void setLabelLastACQU(std::string);
-    void setCurrentGoAT(std::string);
+    void setLabelLastGoAT(std::string);
 
     QPushButton* getButtonRunGoAT();
     QPushButton* getButtonKillGoAT();

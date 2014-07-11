@@ -6,29 +6,39 @@ ConfigGUI::ConfigGUI()
 {
     GoAT_Config = nullValue;
     GoAT_Exe = nullValue;
+    Phys_Exe = nullValue;
     ACQU_Dir = nullValue;
     GoAT_Dir = nullValue;
     LastFile = nullValue;
     Physics_Dir = nullValue;
     LastGoATFile = nullValue;
+    ACQU_prefix = "Acqu_";
+    GoAT_prefix = "GoAT__";
+    Phys_prefix = "Physics_";
 }
 
 ConfigGUI::ConfigGUI(std::string filepath)
 {
     GoAT_Config = nullValue;
     GoAT_Exe = nullValue;
+    Phys_Exe = nullValue;
     ACQU_Dir = nullValue;
     GoAT_Dir = nullValue;
     LastFile = nullValue;
     Physics_Dir = nullValue;
     LastGoATFile = nullValue;
+    ACQU_prefix = "Acqu_";
+    GoAT_prefix = "GoAT_";
+    Phys_prefix = "Physics_";
     ConfigFilePath = filepath;
+
 }
 
 void ConfigGUI::PrintAll()
 {
     std::cout << this->GoAT_Config << std::endl;
     std::cout << this->GoAT_Exe << std::endl;
+    std::cout << this->Phys_Exe << std::endl;
     std::cout << this->ACQU_Dir << std::endl;
     std::cout << this->GoAT_Dir << std::endl;
     std::cout << this->Physics_Dir << std::endl;
@@ -51,12 +61,15 @@ bool ConfigGUI::loadGUIConfigFile(std::string config_file)
 
     this->GoAT_Config = ReadConfig("GoAT-Config",0,(Char_t*)config_file.c_str());
     this->GoAT_Exe = ReadConfig("GoAT-Executable",0,(Char_t*)config_file.c_str());
+    this->Phys_Exe = ReadConfig("Phys-Executable",0,(Char_t*)config_file.c_str());
     this->ACQU_Dir = ReadConfig("ACQU-Dir",0,(Char_t*)config_file.c_str());
     this->GoAT_Dir = ReadConfig("GoAT-Dir",0,(Char_t*)config_file.c_str());
     this->Physics_Dir = ReadConfig("Physics-Dir",0,(Char_t*)config_file.c_str());
     this->LastFile = ReadConfig("LastFile",0,(Char_t*)config_file.c_str());
     this->LastGoATFile = ReadConfig("LastGoATFile",0,(Char_t*)config_file.c_str());
-
+    this->ACQU_prefix = ReadConfig("ACQU-prefix",0,(Char_t*)config_file.c_str());
+    this->GoAT_prefix = ReadConfig("GoAT-prefix",0,(Char_t*)config_file.c_str());
+    this->Phys_prefix = ReadConfig("Phys-prefix",0,(Char_t*)config_file.c_str());
     return true;
 }
 
@@ -70,6 +83,11 @@ void ConfigGUI::setLastACQUFile(std::string file)
     this->LastFile = file;
 }
 
+void ConfigGUI::setLastGoATFile(std::string file)
+{
+    this->LastGoATFile = file;
+}
+
 void ConfigGUI::writeGUIConfigFile(const std::string filename)
 {
     std::ofstream outfile (filename.c_str(), std::ofstream::binary);
@@ -79,6 +97,8 @@ void ConfigGUI::writeGUIConfigFile(const std::string filename)
         outputData.append("GoAT-Config: ").append(this->GoAT_Config).append("\n");
     if (this->GoAT_Exe != nullValue)
         outputData.append("GoAT-Executable: ").append(this->GoAT_Exe).append("\n");
+    if (this->Phys_Exe != nullValue)
+        outputData.append("Phys-Executable: ").append(this->Phys_Exe).append("\n");
     if (this->ACQU_Dir != nullValue)
         outputData.append("ACQU-Dir: ").append(this->ACQU_Dir).append("\n");
     if (this->GoAT_Dir != nullValue)
@@ -89,6 +109,10 @@ void ConfigGUI::writeGUIConfigFile(const std::string filename)
         outputData.append("LastFile: ").append(this->LastFile).append("\n");
     if (this->LastGoATFile != nullValue)
         outputData.append("LastGoATFile: ").append(this->LastGoATFile).append("\n");
+
+        outputData.append("ACQU-prefix: ").append(this->ACQU_prefix).append("\n");
+        outputData.append("GoAT-prefix: ").append(this->GoAT_prefix).append("\n");
+        outputData.append("Phys-prefix: ").append(this->Phys_prefix).append("\n");
 
     outfile.write (outputData.c_str(),outputData.size());
     outfile.close();
@@ -171,6 +195,11 @@ std::string ConfigGUI::getGoATExe()
     return this->GoAT_Exe;
 }
 
+std::string ConfigGUI::getPhysExe()
+{
+    return this->Phys_Exe;
+}
+
 std::string ConfigGUI::getACQUDir()
 {
     return this->ACQU_Dir;
@@ -194,4 +223,19 @@ std::string ConfigGUI::getLastFile()
 std::string ConfigGUI::getLastGoATFile()
 {
     return this->LastGoATFile;
+}
+
+std::string ConfigGUI::getACQUPrefix()
+{
+    return this->ACQU_prefix;
+}
+
+std::string ConfigGUI::getGoATPrefix()
+{
+    return this->GoAT_prefix;
+}
+
+std::string ConfigGUI::getPhysPrefix()
+{
+    return this->Phys_prefix;
 }

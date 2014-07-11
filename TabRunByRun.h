@@ -17,6 +17,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "ConfigGui.h"
 
 namespace Ui {
 class TabRunByRun;
@@ -30,6 +31,7 @@ public:
     explicit TabRunByRun(QWidget *parent = 0);
     ~TabRunByRun();
     void updateRootFile(const char *file);
+    void updateRootPhysicsFile(const char *file);
 
 private slots:
     void on_pushButtonZoomIn_clicked();
@@ -57,14 +59,19 @@ private slots:
     void on_buttonTaps3Minus_clicked();
 
 public slots:
-        void updateAllGraphics();
+        void UpdateAllGraphics();
+        void UpdateGraphicsPhysics();
+        void UpdateGraphicsDetectors();
 private:
     Ui::TabRunByRun *ui;
+    ConfigGUI configGUI;
     int horizontalSize;
     int verticalSize;
     TFile*  file;
+    TFile* PhysicsFile;
+
     TH2F * h2;
-    void FillWidget(TQtWidget *Twidget, std::string detector, std::string filename);
+    void FillWidget(TQtWidget *Twidget, TFile* tfile, std::string detector, std::string filename);
 };
 
 #endif // TABRUNBYRUN_H

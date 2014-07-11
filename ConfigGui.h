@@ -27,11 +27,17 @@ public:
 
     std::string getGoATConfig();
     std::string getGoATExe();
+    std::string getPhysExe();
     std::string getACQUDir();
     std::string getGoATDir();
     std::string getPhysicsDir();
     std::string getLastFile();
     std::string getLastGoATFile();
+    std::string getLastPhysFile();
+
+    std::string getACQUPrefix();
+    std::string getGoATPrefix();
+    std::string getPhysPrefix();
 
     void setLastFile(std::string);
     void setLastGoATFile(std::string);
@@ -46,13 +52,18 @@ public:
 private:
     std::string GoAT_Config;
     std::string GoAT_Exe;
+    std::string Phys_Exe;
     std::string ACQU_Dir;
     std::string GoAT_Dir;
     std::string Physics_Dir;
     std::string LastFile;
     std::string LastGoATFile;
+    std::string LastPhysFile;
     std::string ConfigFilePath;
 
+    std::string ACQU_prefix;
+    std::string GoAT_prefix;
+    std::string Phys_prefix;
 };
 
 

@@ -10,6 +10,8 @@
 
 #include <QFileInfo>
 
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -56,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
      * Setting labels
      */
     tabLog->setLabelLastACQU(configGUI.getLastFile());
-    tabLog->setCurrentGoAT(configGUI.getLastGoATFile());
+    tabLog->setLabelLastGoAT(configGUI.getLastGoATFile());
 
 
     /*
@@ -76,9 +78,17 @@ MainWindow::MainWindow(QWidget *parent) :
     this->GoATarguments = new QStringList;
     connect(GoATProcess, SIGNAL(finished(int)), this, SLOT(newGoatFile()));
 
+    /*
+     * Signal of when Physics Analysis is finished
+     */
     this->PhysicsProcess = new QProcess(this);
+    this->PhysicsArguments = new QStringList;
+    connect(PhysicsProcess, SIGNAL(finished(int)), this, SLOT(newPhysicsFile()));
 
 
+    /*
+     * Log tab buttons
+     */
     connect(tabLog->getButtonRunGoAT(), SIGNAL(clicked()), this, SLOT(ForceRunGoAT()));
     connect(tabLog->getButtonKillGoAT(), SIGNAL(clicked()), this, SLOT(killGoatProcess()));
 
@@ -118,9 +128,9 @@ void MainWindow::ACQUdirChanged(QString path)
     }
 
 
-    if ((newFile != this->curFile && newFile != "") || OpeningAtempt > 0)
+    if ((newFile != this->curFile && newFile != "") || this->OpeningAtempt > 0)
     {
-        if (this->GoATProcess->state() == QProcess::NotRunning)
+        if ((this->GoATProcess->state() == QProcess::NotRunning) || this->OpeningAtempt > 0)
         {
             /* Attempt to open the file that was being used by another program */
             if (this->OpeningAtempt > 0)
@@ -139,7 +149,10 @@ void MainWindow::ACQUdirChanged(QString path)
                 this->ACQUFilesQueue.erase(ACQUFilesQueue.begin());
                 tabLog->setLabelLastACQU(this->curFile);
                 configGUI.setLastACQUFile(this->curFile);
-                //future = QtConcurrent::run(this, &MainWindow::RunGoat);
+
+                tabRunByRun->updateRootFile(this->curFile.c_str());
+                tabRunByRun->UpdateGraphicsDetectors();
+
                 RunGoat();
                 return;
             }
@@ -148,7 +161,10 @@ void MainWindow::ACQUdirChanged(QString path)
             this->curFile = newFile;
             tabLog->setLabelLastACQU(this->curFile);
             configGUI.setLastACQUFile(this->curFile);
-            //future = QtConcurrent::run(this, &MainWindow::RunGoat);
+
+            tabRunByRun->updateRootFile(this->curFile.c_str());
+            tabRunByRun->UpdateGraphicsDetectors();
+
             RunGoat();
             return;
 
@@ -170,6 +186,7 @@ void MainWindow::RunGoat()
     if (this->GoATProcess->state() != QProcess::NotRunning)
         return;
 
+    std::cout << "here" << std::endl;
     int MaxContinueAttempts = 5;
 
     // are we attempting to check file?
@@ -179,16 +196,20 @@ void MainWindow::RunGoat()
         this->OpeningAtempt = 0;
         return;
     }
-
+    std::cout << "here 1" << std::endl;
     *GoATarguments << "-f" << this->curFile.c_str()
-               << "-D" << configGUI.getGoATDir().c_str()
-               << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
+                   << "-D" << configGUI.getGoATDir().c_str()
+                   << "-p" << configGUI.getACQUPrefix().c_str()
+                   << "-P" << configGUI.getGoATPrefix().c_str()
+                   << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
     /*
      * Checking if file is in use (usually working)
      */
 
     QFileInfo qfile(this->curFile.c_str());
+
+    /* Check if files was modified in 5 seconds, else use it */
     if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-5))
     {
         tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
@@ -199,31 +220,17 @@ void MainWindow::RunGoat()
         this->RunGoat();
         return;
     }
+    std::cout << "here" << std::endl;
 
-//    TFile *file_in = TFile::Open(this->curFile.c_str(), "READ");
-//    if(!file_in)
-//    {
-//        tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
-//        std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
-
-//        TakeANap(5000);
-
-//        this->OpeningAtempt++;
-//        this->RunGoat();
-//        return;
-//    }
-//    file_in->Close();
-
+    /* File seems to be okay, taking a nap and starting GoAT */
     this->OpeningAtempt = 0;
-    std::cout << "stop scanning" << std::endl;
 
     TakeANap(5000);
-
-
     tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
 
     if (this->GoATProcess->state() == QProcess::NotRunning)
         GoATProcess->start(configGUI.getGoATExe().c_str(), *GoATarguments);
+
 }
 
 void MainWindow::TakeANap(int ms)
@@ -246,8 +253,10 @@ void MainWindow::ForceRunGoAT()
     }
 
     *GoATarguments << "-f" << this->curFile.c_str()
-               << "-D" << configGUI.getGoATDir().c_str()
-               << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
+                   << "-D" << configGUI.getGoATDir().c_str()
+                   << "-p" << "Acqu_"
+                   << "-P" << "GoATX"
+                   << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
     TFile *file_in = TFile::Open(this->curFile.c_str());
     if(!file_in)
@@ -278,24 +287,87 @@ void MainWindow::newGoatFile()
     QString p_stderr = GoATProcess->readAllStandardError();
     QString pa = GoATProcess->readAll();
 
-    std::cout << "Output: \n" << p_stdout.toStdString() << std::endl;
-    std::cout << "Error: \n" << p_stderr.toStdString() << std::endl;
-    std::cout << pa.toStdString() << std::endl;
-
+    //std::cout << "Output: \n" << p_stdout.toStdString() << std::endl;
+    //std::cout << "Error: \n" << p_stderr.toStdString() << std::endl;
+    //std::cout << pa.toStdString() << std::endl;
     std::cout << "finished" << std::endl;
-    this->continueScanning = true;
-    this->OpeningAtempt = 0;
 
+    //this->continueScanning = true;
+    this->OpeningAtempt = 0;
     tabLog->AppendTextNL("GoAT Output Stream", p_stdout.toStdString());
     tabLog->AppendTextNL("GoAT Error Stream", p_stderr.toStdString());
 
-
-    tabRunByRun->updateRootFile("/home/august/a2GoAT/Acqu_Compton_355.root");
-    tabRunByRun->updateAllGraphics();
-
-    // save to file
+    // Only storing changes of files that were used in computation
     configGUI.writeGUIConfigFile();
 
+    /* Obtaining absolute GoAT file path */
+    QFileInfo fileInfo(this->curFile.c_str());
+
+    QString GoATFileName = fileInfo.fileName().replace(configGUI.getACQUPrefix().c_str(), configGUI.getGoATPrefix().c_str());
+    QString GoATFilePath = QString(configGUI.getGoATDir().c_str()) + GoATFileName;
+
+    QFile GoATFile(GoATFilePath);
+
+    if (GoATFile.exists())
+    {
+        tabLog->AppendTextNL("New " + TabLog::ColorB("GoAT", "BlueViolet") + " file: " + TabLog::Color(GoATFilePath.toStdString(), "DarkOliveGreen"));
+        tabLog->setLabelLastGoAT(GoATFilePath.toStdString());
+        configGUI.setLastGoATFile(GoATFilePath.toStdString());
+
+        *PhysicsArguments << "-f" << "/home/august/a2GoAT/goatout/GoAT_Compton_355.root"
+                       << "-D" << configGUI.getPhysicsDir().c_str()
+                       << "-p" << configGUI.getGoATPrefix().c_str()
+                       << "-P" << configGUI.getPhysPrefix().c_str()
+                       << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
+
+        TakeANap(1000);
+
+        tabLog->AppendTextNL("Starting " + TabLog::ColorB("Physics Analysis", "RoyalBlue ") + " with: " + TabLog::Color(GoATFilePath.toStdString(), "DarkOliveGreen"));
+
+        if (this->PhysicsProcess->state() == QProcess::NotRunning)
+             PhysicsProcess->start(configGUI.getPhysExe().c_str(), *PhysicsArguments);
+
+    } else {
+        tabLog->AppendText1L("File Error: ", "DarkMagenta", "GoAT file " + TabLog::Color(GoATFilePath.toStdString(), "DarkOliveGreen") + " was not found, skipping " + TabLog::ColorB("Physics Analysis", "RoyalBlue "));
+
+        /* No GoAT found, continue work with ACQU */
+        if (!this->ACQUFilesQueue.empty())
+        {
+            this->curFile = this->ACQUFilesQueue[0];
+            this->ACQUFilesQueue.erase(ACQUFilesQueue.begin());
+            tabLog->setLabelLastACQU(this->curFile);
+            configGUI.setLastACQUFile(this->curFile);
+            RunGoat();
+        }
+    }
+}
+
+void MainWindow::newPhysicsFile()
+{
+
+    QString p_stdout = PhysicsProcess->readAllStandardOutput();
+    QString p_stderr = PhysicsProcess->readAllStandardError();
+    QString pa = PhysicsProcess->readAll();
+
+    tabLog->AppendTextNL("Physics Analysis Output Stream", p_stdout.toStdString());
+    tabLog->AppendTextNL("Physics Analysis Error Stream", p_stderr.toStdString());
+
+    // Update GUI config with lastGoAtFile Only storing changes of files that were used in computation
+    configGUI.writeGUIConfigFile();
+
+    /* Obtaining Physics file path */
+    QFileInfo fileInfo(this->curFile.c_str());
+    QString PhysicsFileName = fileInfo.fileName().replace(configGUI.getACQUPrefix().c_str(), configGUI.getPhysPrefix().c_str());
+    QString PhysicsFilePath = QString(configGUI.getPhysicsDir().c_str()) + PhysicsFileName;
+
+    std::cout << PhysicsFilePath.toStdString() << std::endl;
+
+    /* Update Physics plots from new file */
+    tabRunByRun->updateRootPhysicsFile(PhysicsFilePath.toStdString().c_str());
+    tabRunByRun->UpdateGraphicsPhysics();
+
+
+    /* Check the queue for ACQU files */
     if (!this->ACQUFilesQueue.empty())
     {
         this->curFile = this->ACQUFilesQueue[0];
@@ -304,6 +376,8 @@ void MainWindow::newGoatFile()
         configGUI.setLastACQUFile(this->curFile);
         RunGoat();
     }
+
+
 }
 
 void MainWindow::on_actionEdig_config_file_triggered()
