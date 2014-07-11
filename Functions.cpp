@@ -86,13 +86,22 @@ static std::string getNewestFile(std::string iDirIn, char* extension)
     dir.setCurrent(iDir);
 
     QStringList filters;
-    filters << extension;
+    filters << "*.root";
     dir.setNameFilters(filters);
 
     QFileInfoList list = dir.entryInfoList();
+
+    /*
+    foreach(QFileInfo f, list)
+    {
+        std::cout << f.fileName().toStdString() << std::endl;
+    }
+    */
+
     if (list.empty())
         return "";
 
+    //std::cout << "out "<<list.at(0).fileName().toStdString() << std::endl;
     return (list.at(0).absoluteFilePath().toStdString());
 }
 

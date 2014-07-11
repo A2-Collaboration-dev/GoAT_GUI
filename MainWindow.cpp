@@ -124,6 +124,7 @@ void MainWindow::ACQUdirChanged(QString path)
     std::string newFile = getNewestFile(configGUI.getACQUDir(), "*.root");
 
     /* Checking if this file was already used before */
+
     if((std::find(FinishedACQUFiles.begin(), FinishedACQUFiles.end(), newFile) != FinishedACQUFiles.end()))
     {
         tabLog->AppendTextNL("File was already used in GoAT: " + TabLog::Color(newFile, "DarkOliveGreen"));
@@ -131,10 +132,11 @@ void MainWindow::ACQUdirChanged(QString path)
     }
 
 
+
+
     if ((newFile != this->curFile && newFile != "") || this->OpeningAtempt > 0)
     {
-        if ((this->GoATProcess->state() == QProcess::NotRunning && this->PhysicsProcess->state() == QProcess::NotRunning)
-          || this->OpeningAtempt > 0) // (not needed?)
+        if ((((this->GoATProcess->state() == QProcess::NotRunning) && (this->PhysicsProcess->state() == QProcess::NotRunning)) || (OpeningAtempt > 0))) // (not needed?)
         {
             /* Attempt to open the file that was being used by another program */
             if (this->OpeningAtempt > 0)
@@ -154,9 +156,9 @@ void MainWindow::ACQUdirChanged(QString path)
                 tabLog->setLabelLastACQU(this->curFile);
                 configGUI.setLastACQUFile(this->curFile);
 
-                tabRunByRun->updateRootFile(this->curFile.c_str());
-                tabRunByRun->UpdateGraphicsDetectors();
-
+               // tabRunByRun->updateRootFile(this->curFile.c_str());
+               // tabRunByRun->UpdateGraphicsDetectors();
+                std::cout << "acqu files list" << std::endl;
                 RunGoat();
                 return;
             }
@@ -166,9 +168,9 @@ void MainWindow::ACQUdirChanged(QString path)
             tabLog->setLabelLastACQU(this->curFile);
             configGUI.setLastACQUFile(this->curFile);
 
-            tabRunByRun->updateRootFile(this->curFile.c_str());
-            tabRunByRun->UpdateGraphicsDetectors();
-
+            //tabRunByRun->updateRootFile(this->curFile.c_str());
+            //tabRunByRun->UpdateGraphicsDetectors();
+            std::cout << "standard call" << std::endl;
             RunGoat();
             return;
 
@@ -188,8 +190,11 @@ void MainWindow::ACQUdirChanged(QString path)
 
 void MainWindow::RunGoat()
 {
-    if ((this->GoATProcess->state() != QProcess::NotRunning) &&
-         this->PhysicsProcess->state() != QProcess::NotRunning)
+    std::cout << OpeningAtempt << std::endl;
+    if (this->GoATProcess->state() != QProcess::NotRunning)
+        return;
+
+    if (this->PhysicsProcess->state() != QProcess::NotRunning)
         return;
 
     int MaxContinueAttempts = 5;
@@ -201,6 +206,8 @@ void MainWindow::RunGoat()
         this->OpeningAtempt = 0;
         return;
     }
+
+    FinishedACQUFiles.push_back(this->curFile);
 
     *GoATarguments << "-f" << this->curFile.c_str()
                    << "-D" << configGUI.getGoATDir().c_str()
@@ -215,13 +222,12 @@ void MainWindow::RunGoat()
     QFileInfo qfile(this->curFile.c_str());
 
     /* Check if files was modified in 5 seconds, else use it */
-    if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-20))
+    if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-2))
     {
         tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
         std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
-
-        TakeANap(5000);
         this->OpeningAtempt++;
+        TakeANap(5000);
         this->RunGoat();
         return;
     }
@@ -229,11 +235,17 @@ void MainWindow::RunGoat()
     /* File seems to be okay, taking a nap and starting GoAT */
     this->OpeningAtempt = 0;
 
+    tabRunByRun->updateRootFile(this->curFile.c_str());
+    tabRunByRun->UpdateGraphicsDetectors();
+
     TakeANap(5000);
     tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
 
-    if (this->GoATProcess->state() == QProcess::NotRunning)
+    if (this->GoATProcess->state() == QProcess::NotRunning && this->PhysicsProcess->state() == QProcess::NotRunning)
+    {
+        std::cout << "starting GoAT" << std::endl;
         GoATProcess->start(configGUI.getGoATExe().c_str(), *GoATarguments);
+    }
 
 }
 
