@@ -40,8 +40,9 @@ public:
     std::string getPhysPrefix();
 
     void setLastFile(std::string);
-    void setLastGoATFile(std::string);
+    void setLastGoATFile(std::string file);
     void setLastACQUFile(std::string file);
+    void setLastPhysFile(std::string file);
 
     void setConfigFilePath(std::string);
 

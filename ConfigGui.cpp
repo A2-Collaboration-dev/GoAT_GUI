@@ -12,6 +12,7 @@ ConfigGUI::ConfigGUI()
     LastFile = nullValue;
     Physics_Dir = nullValue;
     LastGoATFile = nullValue;
+    LastPhysFile = nullValue;
     ACQU_prefix = "Acqu_";
     GoAT_prefix = "GoAT__";
     Phys_prefix = "Physics_";
@@ -27,6 +28,7 @@ ConfigGUI::ConfigGUI(std::string filepath)
     LastFile = nullValue;
     Physics_Dir = nullValue;
     LastGoATFile = nullValue;
+    LastPhysFile = nullValue;
     ACQU_prefix = "Acqu_";
     GoAT_prefix = "GoAT_";
     Phys_prefix = "Physics_";
@@ -67,6 +69,7 @@ bool ConfigGUI::loadGUIConfigFile(std::string config_file)
     this->Physics_Dir = ReadConfig("Physics-Dir",0,(Char_t*)config_file.c_str());
     this->LastFile = ReadConfig("LastFile",0,(Char_t*)config_file.c_str());
     this->LastGoATFile = ReadConfig("LastGoATFile",0,(Char_t*)config_file.c_str());
+    this->LastPhysFile = ReadConfig("LastPhysFile",0,(Char_t*)config_file.c_str());
     this->ACQU_prefix = ReadConfig("ACQU-prefix",0,(Char_t*)config_file.c_str());
     this->GoAT_prefix = ReadConfig("GoAT-prefix",0,(Char_t*)config_file.c_str());
     this->Phys_prefix = ReadConfig("Phys-prefix",0,(Char_t*)config_file.c_str());
@@ -86,6 +89,11 @@ void ConfigGUI::setLastACQUFile(std::string file)
 void ConfigGUI::setLastGoATFile(std::string file)
 {
     this->LastGoATFile = file;
+}
+
+void ConfigGUI::setLastPhysFile(std::string file)
+{
+    this->LastPhysFile = file;
 }
 
 void ConfigGUI::writeGUIConfigFile(const std::string filename)
@@ -109,6 +117,8 @@ void ConfigGUI::writeGUIConfigFile(const std::string filename)
         outputData.append("LastFile: ").append(this->LastFile).append("\n");
     if (this->LastGoATFile != nullValue)
         outputData.append("LastGoATFile: ").append(this->LastGoATFile).append("\n");
+    if (this->LastPhysFile != nullValue)
+        outputData.append("LastPhysFile: ").append(this->LastPhysFile).append("\n");
 
         outputData.append("ACQU-prefix: ").append(this->ACQU_prefix).append("\n");
         outputData.append("GoAT-prefix: ").append(this->GoAT_prefix).append("\n");
@@ -223,6 +233,11 @@ std::string ConfigGUI::getLastFile()
 std::string ConfigGUI::getLastGoATFile()
 {
     return this->LastGoATFile;
+}
+
+std::string ConfigGUI::getLastPhysFile()
+{
+    return this->LastPhysFile;
 }
 
 std::string ConfigGUI::getACQUPrefix()

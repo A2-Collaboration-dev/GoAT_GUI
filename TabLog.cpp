@@ -67,6 +67,10 @@ void TabLog::setLabelLastGoAT(std::string s)
     ui->labelCurrentGoat->setText(s.c_str());
 }
 
+void TabLog::setLabelLastPhys(std::string s)
+{
+    ui->labelLastPhysics->setText(s.c_str());
+}
 
 std::string TabLog::Bold(std::string str)
 {

@@ -35,6 +35,7 @@ public:
 
     void setLabelLastACQU(std::string);
     void setLabelLastGoAT(std::string);
+    void setLabelLastPhys(std::string);
 
     QPushButton* getButtonRunGoAT();
     QPushButton* getButtonKillGoAT();

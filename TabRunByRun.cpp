@@ -22,7 +22,7 @@ TabRunByRun::TabRunByRun(QWidget *parent) :
     this->PhysicsFile = new TFile;
 
     this->updateRootFile(configGUI.getLastFile().c_str());
-
+    this->updateRootPhysicsFile(configGUI.getLastPhysFile().c_str());
 
 
     ui->scrollArea->setMinimumWidth(800);
@@ -58,28 +58,34 @@ TabRunByRun::TabRunByRun(QWidget *parent) :
     //updateAllGraphics();
 
     this->UpdateGraphicsDetectors();
+    this->UpdateGraphicsPhysics();
 }
 
 TabRunByRun::~TabRunByRun()
 {
-    file->Close();
+    this->file->Close();
+    this->PhysicsFile->Close();
     delete ui;
 }
 
 void TabRunByRun::updateRootPhysicsFile(const char *ifile)
 {
-    std::cout << "physics file updated" << std::endl;
+    std::cout << "physics root file updated" << std::endl;
 
-    if (this->PhysicsFile->IsOpen())
-        this->PhysicsFile->Close();
+    // Does not work for some magical reason
+    //if (this->PhysicsFile->IsOpen())
+    //    this->PhysicsFile->Close();
+    //if (ifile != nullptr)
 
     this->PhysicsFile = TFile::Open(ifile);
+
     if (!this->PhysicsFile)
         std::cout << "could not open physics file" << std::endl;
 }
 
 void TabRunByRun::UpdateGraphicsDetectors()
 {
+    std::cout << "updating graphics detectors" << std::endl;
     FillWidget(ui->widget, file, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     FillWidget(ui->widgetTaps1, file, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     FillWidget(ui->widgetTaps2, file, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
@@ -88,19 +94,25 @@ void TabRunByRun::UpdateGraphicsDetectors()
 
 void TabRunByRun::UpdateGraphicsPhysics()
 {
+    std::cout << "updating graphics physics" << std::endl;
     FillWidget(ui->widgetPA, PhysicsFile, std::string("PA"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
 }
 
 void TabRunByRun::updateRootFile(const char* ifile)
 {
-    std::cout << "root file updated "<< file << std::endl;
+    std::cout << "root file updated "<< ifile << std::endl;
 
-    if (this->file->IsOpen())
-        this->file->Close();
+   // Does not work for some magical reason
+   // if (this->file->IsOpen())
+   //     this->file->Close();
+   //if (file != nullptr)
 
     this->file = TFile::Open(ifile);
+
     if(!this->file)
         std::cout << "not okay" << std::endl;
+
+    std::cout << "end of update root file" << std::endl;
 
 }
 

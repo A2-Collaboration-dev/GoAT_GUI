@@ -130,7 +130,8 @@ void MainWindow::ACQUdirChanged(QString path)
 
     if ((newFile != this->curFile && newFile != "") || this->OpeningAtempt > 0)
     {
-        if ((this->GoATProcess->state() == QProcess::NotRunning) || this->OpeningAtempt > 0)
+        if ((this->GoATProcess->state() == QProcess::NotRunning && this->PhysicsProcess->state() == QProcess::NotRunning)
+          || this->OpeningAtempt > 0) // (not needed?)
         {
             /* Attempt to open the file that was being used by another program */
             if (this->OpeningAtempt > 0)
@@ -172,6 +173,7 @@ void MainWindow::ACQUdirChanged(QString path)
             // if the file is really new never been in the list
             if(!(std::find(ACQUFilesQueue.begin(), ACQUFilesQueue.end(), newFile) != ACQUFilesQueue.end())) {
                 ACQUFilesQueue.push_back(newFile);
+                tabLog->AppendTextNL("New file detected: " + TabLog::Color(newFile, "DarkOliveGreen"));
                 tabLog->AppendTextNL(TabLog::ColorB("GoAT", "BlueViolet") + " is already running. File added to queue: " + TabLog::Color(newFile, "DarkOliveGreen")  + " [" + std::to_string(ACQUFilesQueue.size()) + "]");
                 std::cout << "file in queue" + newFile << std::endl;
             }
@@ -183,10 +185,10 @@ void MainWindow::ACQUdirChanged(QString path)
 
 void MainWindow::RunGoat()
 {
-    if (this->GoATProcess->state() != QProcess::NotRunning)
+    if ((this->GoATProcess->state() != QProcess::NotRunning) &&
+         this->PhysicsProcess->state() != QProcess::NotRunning)
         return;
 
-    std::cout << "here" << std::endl;
     int MaxContinueAttempts = 5;
 
     // are we attempting to check file?
@@ -196,7 +198,7 @@ void MainWindow::RunGoat()
         this->OpeningAtempt = 0;
         return;
     }
-    std::cout << "here 1" << std::endl;
+
     *GoATarguments << "-f" << this->curFile.c_str()
                    << "-D" << configGUI.getGoATDir().c_str()
                    << "-p" << configGUI.getACQUPrefix().c_str()
@@ -220,7 +222,6 @@ void MainWindow::RunGoat()
         this->RunGoat();
         return;
     }
-    std::cout << "here" << std::endl;
 
     /* File seems to be okay, taking a nap and starting GoAT */
     this->OpeningAtempt = 0;
@@ -314,11 +315,11 @@ void MainWindow::newGoatFile()
         tabLog->setLabelLastGoAT(GoATFilePath.toStdString());
         configGUI.setLastGoATFile(GoATFilePath.toStdString());
 
-        *PhysicsArguments << "-f" << "/home/august/a2GoAT/goatout/GoAT_Compton_355.root"
-                       << "-D" << configGUI.getPhysicsDir().c_str()
-                       << "-p" << configGUI.getGoATPrefix().c_str()
-                       << "-P" << configGUI.getPhysPrefix().c_str()
-                       << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
+        *PhysicsArguments << "-f" << GoATFilePath.toStdString().c_str()
+                          << "-D" << configGUI.getPhysicsDir().c_str()
+                          << "-p" << configGUI.getGoATPrefix().c_str()
+                          << "-P" << configGUI.getPhysPrefix().c_str()
+                          << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
         TakeANap(1000);
 
@@ -352,9 +353,6 @@ void MainWindow::newPhysicsFile()
     tabLog->AppendTextNL("Physics Analysis Output Stream", p_stdout.toStdString());
     tabLog->AppendTextNL("Physics Analysis Error Stream", p_stderr.toStdString());
 
-    // Update GUI config with lastGoAtFile Only storing changes of files that were used in computation
-    configGUI.writeGUIConfigFile();
-
     /* Obtaining Physics file path */
     QFileInfo fileInfo(this->curFile.c_str());
     QString PhysicsFileName = fileInfo.fileName().replace(configGUI.getACQUPrefix().c_str(), configGUI.getPhysPrefix().c_str());
@@ -366,6 +364,10 @@ void MainWindow::newPhysicsFile()
     tabRunByRun->updateRootPhysicsFile(PhysicsFilePath.toStdString().c_str());
     tabRunByRun->UpdateGraphicsPhysics();
 
+    /* Updating with GoAT and Physics file info */
+    tabLog->setLabelLastPhys(PhysicsFilePath.toStdString());
+    configGUI.setLastPhysFile(PhysicsFilePath.toStdString());
+    configGUI.writeGUIConfigFile();
 
     /* Check the queue for ACQU files */
     if (!this->ACQUFilesQueue.empty())

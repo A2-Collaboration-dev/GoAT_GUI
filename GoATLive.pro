@@ -48,3 +48,5 @@ QMAKE_CXXFLAGS += -std=c++0x
 
 RESOURCES += \
     Resources.qrc
+
+QMAKE_CXXFLAGS += -Wno-write-strings
