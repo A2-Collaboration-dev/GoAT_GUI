@@ -94,6 +94,7 @@ private slots:
   void killPhysicsProcess();
   void on_actionEdig_config_file_triggered();
   void RunGoat();
+  void ExitingGoat();
 };
 
 #endif // MAINWINDOW_H

@@ -106,6 +106,7 @@ MainWindow::~MainWindow()
     GoATProcess->close();
     delete GoATProcess;
     delete ui;
+    std::cout << "~MainWindow()" << std::endl;
 }
 
 void MainWindow::setAbsolutePath(std::string path)
@@ -407,11 +408,18 @@ void MainWindow::on_actionEdig_config_file_triggered()
 void MainWindow::killGoatProcess()
 {
     std::cout << "GoATProcess kill" << std::endl;
-    GoATProcess->kill();
+    this->GoATProcess->kill();
 }
 
 void MainWindow::killPhysicsProcess()
 {
     std::cout << "PhysicsProcess kill" << std::endl;
-    PhysicsProcess->kill();
+    this->PhysicsProcess->kill();
+}
+
+void MainWindow::ExitingGoat()
+{
+    std::cout << "exiting GoAT" << std::endl;
+    this->GoATProcess->kill();
+    this->PhysicsProcess->kill();
 }

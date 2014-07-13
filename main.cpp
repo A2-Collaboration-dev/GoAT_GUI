@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
     (*w).setWindowTitle("GoAT - GUI");
     (*w).setWindowIcon(QIcon(":/icons/data/Fixicon-Farm-Goat.ico"));
 
+    QObject::connect(&a, SIGNAL(aboutToQuit()), w, SLOT(ExitingGoat()));
 
     (*w).showMaximized();
 
