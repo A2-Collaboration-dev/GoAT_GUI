@@ -47,6 +47,9 @@ include("$(ROOTSYS)/include/rootcint.pri")
 QMAKE_CXXFLAGS += -std=c++0x
 
 RESOURCES += \
-    Resources.qrc
+    Resources.qrc \
+    icons.qrc
 
 QMAKE_CXXFLAGS += -Wno-write-strings
+
+ICON = data/Fixicon-Farm-Goat.ico
