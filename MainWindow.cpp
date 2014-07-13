@@ -207,8 +207,6 @@ void MainWindow::RunGoat()
         return;
     }
 
-    FinishedACQUFiles.push_back(this->curFile);
-
     *GoATarguments << "-f" << this->curFile.c_str()
                    << "-D" << configGUI.getGoATDir().c_str()
                    << "-p" << configGUI.getACQUPrefix().c_str()
@@ -228,6 +226,7 @@ void MainWindow::RunGoat()
         std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
         this->OpeningAtempt++;
         TakeANap(5000);
+        this->FinishedACQUFiles.push_back(this->curFile);
         this->RunGoat();
         return;
     }
@@ -292,6 +291,7 @@ void MainWindow::ForceRunPhysics()
         return;
     }
 
+    /* newGoatFile() will transform curFile into an appropriate directory for corresponding GoAT file */
     this->curFile = this->configGUI.getLastFile();
     this->newGoatFile();
 }
