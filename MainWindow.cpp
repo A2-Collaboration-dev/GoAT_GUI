@@ -121,6 +121,8 @@ void MainWindow::FileChecker()
 
 void MainWindow::ACQUdirChanged(QString path)
 {
+    if (path.isEmpty())
+        return;
 
     std::string newFile = getNewestFile(configGUI.getACQUDir(), "*.root");
 

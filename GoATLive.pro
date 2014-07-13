@@ -21,7 +21,6 @@ SOURCES += main.cpp\
     ConfigFile.cpp \
     TabRunByRun.cpp \
     TabComplete.cpp \
-    Functions.cpp \
     ConfigGui.cpp \
     TabLog.cpp
 
@@ -32,7 +31,8 @@ HEADERS  += \
     TabRunByRun.h \
     TabComplete.h \
     ConfigGui.h \
-    TabLog.h
+    TabLog.h \
+    Functions.h
 
 FORMS    += \
     configurationdialog.ui \
@@ -51,5 +51,7 @@ RESOURCES += \
     icons.qrc
 
 QMAKE_CXXFLAGS += -Wno-write-strings
+QMAKE_CXXFLAGS += -Wno-unused-parameter
+QMAKE_CXXFLAGS += -Wno-unused-function
 
 ICON = data/Fixicon-Farm-Goat.ico

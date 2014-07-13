@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "ConfigGui.h"
+#include "Functions.h"
 
 namespace Ui {
 class TabRunByRun;

@@ -2,9 +2,6 @@
 #include "ui_tabrunbyrun.h"
 
 
-
-#include "Functions.cpp"
-
 TabRunByRun::TabRunByRun(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TabRunByRun)

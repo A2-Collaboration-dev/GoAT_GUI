@@ -1,9 +1,12 @@
+#ifndef FUNCTA_H
+#define FUNCTA_H
+
 #include <functional>
 #include <cstring>
 #include <vector>
 #include <sstream>
 #include <string>
- #include <QCoreApplication>
+#include <QCoreApplication>
 
 #include <TROOT.h>
 #include <TFile.h>
@@ -40,6 +43,7 @@ static void getNamesList(std::string lookfor, std::vector<std::string> &pass, st
 
     }
 }
+
 
 /*
 static std::string GUISettingsGet(std::string lookupKey)
@@ -86,7 +90,7 @@ static std::string getNewestFile(std::string iDirIn, char* extension)
     dir.setCurrent(iDir);
 
     QStringList filters;
-    filters << "*.root";
+    filters << extension;
     dir.setNameFilters(filters);
 
     QFileInfoList list = dir.entryInfoList();
@@ -105,4 +109,4 @@ static std::string getNewestFile(std::string iDirIn, char* extension)
     return (list.at(0).absoluteFilePath().toStdString());
 }
 
-
+#endif //FUNCTA_H

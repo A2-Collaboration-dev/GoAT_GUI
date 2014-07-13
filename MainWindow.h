@@ -11,7 +11,7 @@
 
 #include "ConfigFile.h"
 #include "ConfigGui.h"
-//#include "Functions.cpp"
+#include "Functions.h"
 
 
 #include "TGraph.h"
@@ -19,7 +19,7 @@
 #include "TCanvas.h"
 #include "TLine.h"
 
-#include "Functions.cpp"
+
 #include <QFileSystemWatcher>
 #include <QProcess>
 #include <TROOT.h>
