@@ -105,6 +105,8 @@ private:
     std::map<const char*, TLine*, cmp_str> MaxValMap;
     std::map<const char*, TLine*, cmp_str> MinValMap;
 
+    std::string currentTName;
+
     TLine*  GlobalMax;
     TLine*  GlobalMin;
 

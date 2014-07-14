@@ -61,6 +61,7 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
     connect(ui->TWidgetCut, SIGNAL(RootEventProcessed(TObject*,uint,TCanvas*)), this , SLOT(RootSpinBoxEvent(TObject*,uint,TCanvas*)));
     connect(ui->TWidgetCut, SIGNAL(RootEventProcessed(TObject*,uint,TCanvas*)), this , SLOT(RootCanvasEvent(TObject*,uint,TCanvas*)));
 
+    //connect(ui->)
     /*
      * Setting default start path when browsing for file.
      */
@@ -357,6 +358,7 @@ void ConfigurationDialog::RootCanvasEvent(TObject* object, uint event, TCanvas* 
 
             GlobalMax = MaxValMap[gPad->GetName()];
             GlobalMin = MinValMap[gPad->GetName()];
+            this->currentTName = std::string(gPad->GetName());
         }
 }
 
@@ -377,6 +379,10 @@ void ConfigurationDialog::on_spinBoxMin_valueChanged(double arg1)
         GlobalMin->SetX2(arg1);
         ui->TWidgetCut->Refresh();
     }
+    if (this->currentTName == std::string("SelectCuts1"))
+        configFile.setTimeCutMinApparatus1(std::to_string(arg1));
+    if (this->currentTName == std::string("SelectCuts2"))
+        configFile.setTimeCutMinApparatus2(std::to_string(arg1));
 }
 
 void ConfigurationDialog::on_spinBoxMax_valueChanged(double arg1)
@@ -387,6 +393,10 @@ void ConfigurationDialog::on_spinBoxMax_valueChanged(double arg1)
         GlobalMax->SetX2(arg1);
         ui->TWidgetCut->Refresh();
     }
+    if (this->currentTName == std::string("SelectCuts1"))
+        configFile.setTimeCutMaxApparatus1(std::to_string(arg1));
+    if (this->currentTName == std::string("SelectCuts2"))
+        configFile.setTimeCutMaxApparatus2(std::to_string(arg1));
 }
 
 void ConfigurationDialog::updateTQtWidget()
@@ -406,7 +416,7 @@ void ConfigurationDialog::updateTQtWidget()
 
     ui->TWidgetCut->cd(2);
     gPad->SetName("SelectCuts2");
-    tree->Draw("time>>TimeCBA(20000,-100,100)", "Apparatus==1");
+    tree->Draw("time>>TimeCBA(20000,-100,100)", "Apparatus==2");
     CutMin2   = new TLine(-20, -10e20, -20, 10e20);
     CutMin2->SetLineColor(2);
     CutMin2->Draw();
@@ -424,12 +434,12 @@ void ConfigurationDialog::updateTQtWidget()
     MaxValMap["SelectCuts2"] = CutMax2;
 
 
-
     /* Setting default controller to first pad */
     GlobalMax = CutMax1;
     GlobalMin = CutMin1;
 
     ui->TWidgetCut->Refresh();
+    this->currentTName = "SelectCuts1";
 }
 
 bool ConfigurationDialog::importTreeFromFile(char* treename, std::string filename)

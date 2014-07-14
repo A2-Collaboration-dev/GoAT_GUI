@@ -433,3 +433,9 @@ void MainWindow::StreamMonitor()
 {
 
 }
+
+void MainWindow::on_actionToggle_Plot_lock_triggered()
+{
+    this->GoATProcess->kill();
+    this->PhysicsProcess->kill();
+}

@@ -20,18 +20,22 @@ Period-Macro:	100000\n\n",
 # Particle Reconstruction\n\
 #-----------------------------------------------------------------------\n",
 
-"#-----------------------------------------------------------------------\n\
+"\n#-----------------------------------------------------------------------\n\
 # Meson Reconstruction\n\
 #-----------------------------------------------------------------------\n",
 
-"#-----------------------------------------------------------------------\n\
+"\n#-----------------------------------------------------------------------\n\
 # Sorting Preferences\n\
 #-----------------------------------------------------------------------\n\
 # Just turn off a sort completely to ignore a sorting preference\n\
 # Use +, - or = to set counters (ex. 3- will accept 3 or less)\n\n\
 # Sort on number of raw particle tracks (total, CB, and TAPS)\n\
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\
-#					Total 	CB		TAPS\n"
+#					Total 	CB		TAPS\n",
+
+"\n#----------------------------------------------------------------------\n\
+# Time Cuts\n\
+#-----------------------------------------------------------------------\n"
 };
 
 ConfigFile::ConfigFile()
@@ -58,6 +62,11 @@ ConfigFile::ConfigFile()
 
     this->SortRawCBEnergySum = nullValue;
     this->SortNParticles = nullValue;
+
+    this->TimeCutMinApparatus1 = nullValue;
+    this->TimeCutMaxApparatus1 = nullValue;
+    this->TimeCutMinApparatus2 = nullValue;
+    this->TimeCutMaxApparatus2 = nullValue;
 }
 
 ConfigFile::ConfigFile(std::string file)
@@ -103,6 +112,7 @@ void ConfigFile::loadGoATConfigFile(std::string config_file)
 
     this->SortRawCBEnergySum = ReadConfig("SortRaw-CBEnergySum",0,(Char_t*)config_file.c_str());
     this->SortNParticles = ReadConfig("Sort-NParticles",0,(Char_t*)config_file.c_str());
+
 }
 
 void ConfigFile::writeGoATConfigFile(const std::string filename)
@@ -158,6 +168,16 @@ void ConfigFile::writeGoATConfigFile(const std::string filename)
         outputData.append("SortRaw-CBEnergySum: ").append(this->SortRawCBEnergySum).append("\n");
     if (this->SortNParticles != nullValue)
         outputData.append("Sort-NParticles: ").append(this->SortNParticles).append("\n");
+
+    outputData.append(TextFields[4]);
+    if (this->TimeCutMinApparatus1 != nullValue)
+        outputData.append("TimeCutMin1: ").append(this->TimeCutMinApparatus1).append("\n");
+    if (this->TimeCutMaxApparatus1 != nullValue)
+        outputData.append("TimeCutMax1: ").append(this->TimeCutMaxApparatus1).append("\n");
+    if (this->TimeCutMinApparatus2 != nullValue)
+        outputData.append("TimeCutMin2: ").append(this->TimeCutMinApparatus2).append("\n");
+    if (this->TimeCutMaxApparatus2 != nullValue)
+        outputData.append("TimeCutMax2: ").append(this->TimeCutMaxApparatus2).append("\n");
 
     outfile.write (outputData.c_str(),outputData.size());
     outfile.close();
@@ -335,6 +355,26 @@ void ConfigFile::setCut_IM_Width_Eta_Prime(std::string str)
     this->Cut_IM_Width_Eta_Prime = str;
 }
 
+void ConfigFile::setTimeCutMinApparatus1(std::string s)
+{
+    this->TimeCutMinApparatus1 = s;
+}
+
+void ConfigFile::setTimeCutMaxApparatus1(std::string s)
+{
+    this->TimeCutMaxApparatus1 = s;
+}
+
+void ConfigFile::setTimeCutMinApparatus2(std::string s)
+{
+    this->TimeCutMinApparatus2 = s;
+}
+
+void ConfigFile::setTimeCutMaxApparatus2(std::string s)
+{
+    this->TimeCutMaxApparatus2 = s;
+}
+
 std::string ConfigFile::getParticleReconstruction()
 {
     return this->ParticleReconstruction;
@@ -425,4 +465,24 @@ std::string ConfigFile::getCut_IM_Width_Eta()
 std::string ConfigFile::getCut_IM_Width_Eta_Prime()
 {
     return this->Cut_IM_Width_Eta_Prime;
+}
+
+std::string ConfigFile::getTimeCutMinApparatus1()
+{
+    return this->TimeCutMinApparatus1;
+}
+
+std::string ConfigFile::getTimeCutMaxApparatus1()
+{
+    return this->TimeCutMaxApparatus1;
+}
+
+std::string ConfigFile::getTimeCutMinApparatus2()
+{
+    return this->TimeCutMinApparatus2;
+}
+
+std::string ConfigFile::getTimeCutMaxApparatus2()
+{
+    return this->TimeCutMaxApparatus2;
 }

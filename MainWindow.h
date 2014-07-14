@@ -97,6 +97,7 @@ private slots:
   void on_actionEdig_config_file_triggered();
   void RunGoat();
   void ExitingGoat();
+  void on_actionToggle_Plot_lock_triggered();
 };
 
 #endif // MAINWINDOW_H

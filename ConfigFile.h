@@ -45,7 +45,11 @@ private:
     /* Sort on reconstructed Particles */
     std::string SortNParticles;
 
-
+    /* Cuts */
+    std::string TimeCutMinApparatus1;
+    std::string TimeCutMaxApparatus1;
+    std::string TimeCutMinApparatus2;
+    std::string TimeCutMaxApparatus2;
 
 
 public:
@@ -70,18 +74,22 @@ public:
     void setCut_dE_E_Taps_Pion(std::string str);
     void setCut_dE_E_Taps_Electron(std::string str);
 
-    /* Meson reconstruction */
-    void setCut_IM_Width_Pi0(std::string str);
-    void setCut_IM_Width_Eta(std::string str);
-    void setCut_IM_Width_Eta_Prime(std::string str);
-
     /* Pre sorting */
     void setSortRawNParticlesTotal(std::string sign, std::string str);
     void setSortRawNParticlesCB(std::string sign, std::string str);
     void setSortRawNParticlesTAPS(std::string sign, std::string str);
     void setSortRawEnergyCB(std::string str);
 
+    /* Meson reconstruction */
+    void setCut_IM_Width_Pi0(std::string str);
+    void setCut_IM_Width_Eta(std::string str);
+    void setCut_IM_Width_Eta_Prime(std::string str);
 
+    /* Cuts */
+    void setTimeCutMinApparatus1(std::string);
+    void setTimeCutMaxApparatus1(std::string);
+    void setTimeCutMinApparatus2(std::string);
+    void setTimeCutMaxApparatus2(std::string);
 
     std::string getParticleReconstruction();
     std::string getChargedParticleReconstruction();
@@ -104,6 +112,12 @@ public:
     std::string getCut_IM_Width_Pi0();
     std::string getCut_IM_Width_Eta();
     std::string getCut_IM_Width_Eta_Prime();
+
+    /* Cuts */
+    std::string getTimeCutMinApparatus1();
+    std::string getTimeCutMaxApparatus1();
+    std::string getTimeCutMinApparatus2();
+    std::string getTimeCutMaxApparatus2();
 
 
     void loadGoATConfigFile(const char* config_file);

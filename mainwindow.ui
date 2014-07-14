@@ -70,7 +70,7 @@
   </action>
   <action name="actionToggle_Plot_lock">
    <property name="text">
-    <string>Toggle Plot Lock</string>
+    <string>Kill All Processes</string>
    </property>
   </action>
  </widget>
