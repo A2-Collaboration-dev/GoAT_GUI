@@ -61,11 +61,15 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
     connect(ui->TWidgetCut, SIGNAL(RootEventProcessed(TObject*,uint,TCanvas*)), this , SLOT(RootSpinBoxEvent(TObject*,uint,TCanvas*)));
     connect(ui->TWidgetCut, SIGNAL(RootEventProcessed(TObject*,uint,TCanvas*)), this , SLOT(RootCanvasEvent(TObject*,uint,TCanvas*)));
 
-    //connect(ui->)
+
     /*
      * Setting default start path when browsing for file.
      */
     lastCutPath = "/home/";
+
+    /* Temporary */
+    ui->tabWidgetOutput->setEnabled(false);
+    ui->tabWidgetInput->setTabEnabled(1, false);
 
 }
 
@@ -497,7 +501,7 @@ void ConfigurationDialog::updateUIText()
     }
 
     // Min Energy value
-    ui->lineEditConfigPreSortEnergySum->setText(QString(configFile.getSortRawEnergyCB().c_str()));
+    ui->lineEditConfigPreSortEnergySum->setText(QString(configFile.getSortRawEnergyCB().substr(0, configFile.getSortRawEnergyCB().length() - 1).c_str()));
 
     // If cuts are specified
     if (configFile.getCut_dE_E_CB_Proton() != configFile.nullValue ||

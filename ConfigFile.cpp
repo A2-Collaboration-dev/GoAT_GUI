@@ -113,6 +113,11 @@ void ConfigFile::loadGoATConfigFile(std::string config_file)
     this->SortRawCBEnergySum = ReadConfig("SortRaw-CBEnergySum",0,(Char_t*)config_file.c_str());
     this->SortNParticles = ReadConfig("Sort-NParticles",0,(Char_t*)config_file.c_str());
 
+    this->TimeCutMinApparatus1 = ReadConfig("TimeCutMin1",0,(Char_t*)config_file.c_str());
+    this->TimeCutMaxApparatus1 = ReadConfig("TimeCutMax1",0,(Char_t*)config_file.c_str());
+    this->TimeCutMinApparatus2 = ReadConfig("TimeCutMin2",0,(Char_t*)config_file.c_str());
+    this->TimeCutMaxApparatus2 = ReadConfig("TimeCutMax2",0,(Char_t*)config_file.c_str());
+
 }
 
 void ConfigFile::writeGoATConfigFile(const std::string filename)
