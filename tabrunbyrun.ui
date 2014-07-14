@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -488,7 +488,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>520</width>
+            <width>522</width>
             <height>366</height>
            </rect>
           </property>
@@ -530,8 +530,8 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
-                 <normaloff>data/view_refresh.png</normaloff>data/view_refresh.png</iconset>
+                <iconset resource="Resources.qrc">
+                 <normaloff>:/data/view_refresh.png</normaloff>:/data/view_refresh.png</iconset>
                </property>
               </widget>
              </item>
@@ -544,7 +544,11 @@
                 </size>
                </property>
                <property name="text">
-                <string>+</string>
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="Resources.qrc">
+                 <normaloff>:/data/forward.png</normaloff>:/data/forward.png</iconset>
                </property>
               </widget>
              </item>
@@ -557,7 +561,11 @@
                 </size>
                </property>
                <property name="text">
-                <string>-</string>
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="Resources.qrc">
+                 <normaloff>:/data/arrow_down.png</normaloff>:/data/arrow_down.png</iconset>
                </property>
               </widget>
              </item>

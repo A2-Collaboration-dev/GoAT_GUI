@@ -97,6 +97,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->tabLog->AppendTextNL("GUI Initialized.");
 
+    //future = QtConcurrent::run(this,&MainWindow::StreamMonitor);
+    //t = new std::thread(&MainWindow::StreamMonitor, this);
+
 }
 
 MainWindow::~MainWindow()
@@ -424,4 +427,9 @@ void MainWindow::ExitingGoat()
     std::cout << "exiting GoAT" << std::endl;
     this->GoATProcess->kill();
     this->PhysicsProcess->kill();
+}
+
+void MainWindow::StreamMonitor()
+{
+
 }

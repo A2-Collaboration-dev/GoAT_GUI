@@ -27,6 +27,7 @@
 
 #include <QWaitCondition>
 #include <QMutex>
+#include <thread>
 
 
 namespace Ui {
@@ -42,6 +43,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void setAbsolutePath(std::string);
+    void StreamMonitor();
 
 
 private:

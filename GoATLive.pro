@@ -54,4 +54,4 @@ QMAKE_CXXFLAGS += -Wno-write-strings
 QMAKE_CXXFLAGS += -Wno-unused-parameter
 QMAKE_CXXFLAGS += -Wno-unused-function
 
-ICON = data/Fixicon-Farm-Goat.ico
+ICON =

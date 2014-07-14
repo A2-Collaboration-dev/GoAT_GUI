@@ -265,3 +265,24 @@ void TabRunByRun::on_buttonTaps3Minus_clicked()
     ui->widgetTaps3->resize(ui->widgetTaps3->size() + QSize(0, 150));
     ui->scrollAreaWidgetContents_4->resize(ui->widgetTaps3->size() + QSize(0, 150));
 }
+
+void TabRunByRun::on_buttonPAR_clicked()
+{
+    ui->widgetPA->GetCanvas()->Clear();
+    ui->scrollArea_5->setWidgetResizable(true);
+    this->UpdateGraphicsPhysics();
+}
+
+void TabRunByRun::on_buttonPAPlus_clicked()
+{
+    ui->scrollArea_5->setWidgetResizable(false);
+    ui->widgetPA->resize(ui->widgetPA->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_5->resize(ui->widgetPA->size() + QSize(150, 0));
+}
+
+void TabRunByRun::on_buttonTapsPAM_clicked()
+{
+    ui->scrollArea_5->setWidgetResizable(false);
+    ui->widgetPA->resize(ui->widgetPA->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_5->resize(ui->widgetPA->size() + QSize(0, 150));
+}

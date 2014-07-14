@@ -59,6 +59,12 @@ private slots:
 
     void on_buttonTaps3Minus_clicked();
 
+    void on_buttonPAR_clicked();
+
+    void on_buttonPAPlus_clicked();
+
+    void on_buttonTapsPAM_clicked();
+
 public slots:
         void UpdateAllGraphics();
         void UpdateGraphicsPhysics();
