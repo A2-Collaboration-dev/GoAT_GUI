@@ -59,6 +59,10 @@ private:
     void FileChecker();
     void TakeANap(int ms);
 
+    void UpdateCompleteACQU(const char *inputFile);
+    void CompleteExperimentDataUpdate(const char *inputFile, const char *outputFile);
+    void CompleteExperimentDataCreate(const char *inputFile, const char *outputFile);
+
     ConfigurationDialog *configurationDialog;
 
     TabRunByRun* tabRunByRun;

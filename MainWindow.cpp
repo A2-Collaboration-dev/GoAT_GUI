@@ -9,8 +9,29 @@
 #include <thread>
 
 #include <QFileInfo>
+#include "TKey.h"
+#include "TFile.h"
+#include "TSystem.h"
+#include "TTree.h"
+#include "TDirectory.h"
+#include "TDirectoryFile.h"
+#include "TH1.h"
 
 
+void MainWindow::UpdateCompleteACQU(const char* inputFile)
+{
+    tabLog->AppendTextNL("Complete ACQU being updated.");
+
+    QFile CompleteDataFile(configGUI.getCompleteACQUFile().c_str());
+    if (!CompleteDataFile.exists())
+    {
+        std::cout << "Creating Complete experiment data file." << std::endl;
+        CompleteExperimentDataCreate(inputFile, configGUI.getCompleteACQUFile().c_str());
+    } else {
+        std::cout << "Updating Complete experiment data file." << std::endl;
+        CompleteExperimentDataUpdate(inputFile, configGUI.getCompleteACQUFile().c_str());
+    }
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -100,7 +121,21 @@ MainWindow::MainWindow(QWidget *parent) :
     //future = QtConcurrent::run(this,&MainWindow::StreamMonitor);
     //t = new std::thread(&MainWindow::StreamMonitor, this);
 
+    //UpdateCompleteACQU();
+
+    //main function copying 4 files as subdirectories of a new file
+    //TFile *f = new TFile("/home/august/a2GoAT/Arresult.root","recreate");
+    //CopyFile("/home/august/a2GoAT/Acqu_B.root");
+
+    //f->ls();
+    //delete f;
+
+    std::cout << configGUI.getCompleteACQUFile() << std::endl;
+    std::cout << configGUI.getCompletePhysicsFile() << std::endl;
+
 }
+
+
 
 MainWindow::~MainWindow()
 {
@@ -152,7 +187,6 @@ void MainWindow::ACQUdirChanged(QString path)
             }
 
             tabLog->AppendTextNL("New file detected: " + TabLog::Color(newFile, "DarkOliveGreen"));
-
 
             /* Get the first file from the queue */
             if (!this->ACQUFilesQueue.empty())
@@ -220,7 +254,7 @@ void MainWindow::RunGoat()
                    << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
     /*
-     * Checking if file is in use (usually working)
+     * Checking if file is in use
      */
 
     QFileInfo qfile(this->curFile.c_str());
@@ -237,11 +271,20 @@ void MainWindow::RunGoat()
         return;
     }
 
+
     /* File seems to be okay, taking a nap and starting GoAT */
     this->OpeningAtempt = 0;
 
     tabRunByRun->updateRootFile(this->curFile.c_str());
     tabRunByRun->UpdateGraphicsDetectors();
+
+    /*
+     * Copies histograms from new ACQU file to Master complete file
+     * Very important to put this in correct place, or data dublicates may arise
+     * Checking if ACQU files was used for calculations before.
+    */
+    if(!(std::find(FinishedACQUFiles.begin(), FinishedACQUFiles.end(), this->curFile) != FinishedACQUFiles.end()))
+        UpdateCompleteACQU(this->curFile.c_str());
 
     TakeANap(5000);
     tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
@@ -249,8 +292,11 @@ void MainWindow::RunGoat()
     if (this->GoATProcess->state() == QProcess::NotRunning && this->PhysicsProcess->state() == QProcess::NotRunning)
     {
         std::cout << "starting GoAT" << std::endl;
+        this->FinishedACQUFiles.push_back(this->curFile);
         GoATProcess->start(configGUI.getGoATExe().c_str(), *GoATarguments);
     }
+
+
 
 }
 
@@ -438,4 +484,131 @@ void MainWindow::on_actionToggle_Plot_lock_triggered()
 {
     this->GoATProcess->kill();
     this->PhysicsProcess->kill();
+}
+
+void MainWindow::CompleteExperimentDataUpdate(const char *inputFile, const char *outputFile)
+{
+
+    TFile *out = new TFile(outputFile, "RECREATE");
+    TFile *in = new TFile(inputFile);
+    TKey *key;
+    TIter nextkey(in->GetListOfKeys());
+    TDirectory *currentDir;
+
+    while((key = (TKey*)nextkey()))
+    {
+        const char *classname = key->GetClassName();
+        TClass *cl = gROOT->GetClass(classname);
+        TObject *obj = key->ReadObj();
+
+        if (!cl) continue;
+        //std::cout << obj->GetName() << std::endl;
+
+        in->cd();
+        currentDir = in;
+        if (cl->InheritsFrom("TDirectory"))
+        {
+            //std::cout << "\t(directory above)" << std::endl;
+
+            currentDir->cd(obj->GetName());
+            out->mkdir(obj->GetName());
+
+            TKey* dKey;
+            TIter dnextkey(gDirectory->GetListOfKeys()); // !@#
+            while((dKey = (TKey*)dnextkey()))
+            {
+                const char *dclassname = key->GetClassName();
+                TClass *dcl = gROOT->GetClass(dclassname);
+                TObject *dobj = dKey->ReadObj();
+
+                // TH2 *InHist = (TH2*)dobj;
+
+                TH2 *InHist = (TH2*)dobj;
+
+
+                std::string Folder(obj->GetName());
+                std::string HistName(dobj->GetName());
+                std::string FullPath = Folder + "/" + HistName;
+
+                std::cout << "Looking for: " << FullPath.c_str() << std::endl;
+
+                out->cd();
+                TH2 *OutHist = (TH2*)out->Get( FullPath.c_str() );
+
+                if (OutHist != NULL)
+                {
+                    std::cout << "Histogram found updating." << obj->GetName() << std::endl;
+                    OutHist->Add(InHist);
+                    out->cd(obj->GetName());
+                    OutHist->Write();
+                } else
+                {
+                    std::cout << "Could not find histogram, adding. " << obj->GetName() << std::endl;
+                    out->cd(obj->GetName());
+                    dobj->Write();
+                }
+            }
+        }
+
+        if (cl->InheritsFrom("TTree"))
+        {
+            //
+        } else {
+            //
+        }
+    }
+    in->Close();
+    out->Close();
+}
+
+void MainWindow::CompleteExperimentDataCreate(const char *inputFile, const char *outputFile)
+{
+    TFile *out = new TFile(outputFile, "RECREATE");
+    TFile *in = new TFile(inputFile);
+    TKey *key;
+    TIter nextkey(in->GetListOfKeys());
+    TDirectory *currentDir;
+
+    while((key = (TKey*)nextkey()))
+    {
+        const char *classname = key->GetClassName();
+        TClass *cl = gROOT->GetClass(classname);
+        TObject *obj = key->ReadObj();
+
+        if (!cl) continue;
+        //std::cout << obj->GetName() << std::endl;
+
+        in->cd();
+        currentDir = in;
+        if (cl->InheritsFrom("TDirectory"))
+        {
+            //std::cout << "\t(directory above)" << std::endl;
+
+            currentDir->cd(obj->GetName());
+            out->mkdir(obj->GetName());
+
+            TKey* dKey;
+            TIter dnextkey(gDirectory->GetListOfKeys()); // !@#
+            while((dKey = (TKey*)dnextkey()))
+            {
+                const char *dclassname = key->GetClassName();
+                TClass *dcl = gROOT->GetClass(dclassname);
+                TObject *dobj = dKey->ReadObj();
+
+                std::cout << "Copying: " << dobj->GetName() <<std::endl;
+                out->cd(obj->GetName());
+                dobj->Write();
+
+            }
+        }
+
+        if (cl->InheritsFrom("TTree"))
+        {
+            //
+        } else {
+            //
+        }
+    }
+    in->Close();
+    out->Close();
 }

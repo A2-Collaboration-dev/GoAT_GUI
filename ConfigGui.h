@@ -39,6 +39,9 @@ public:
     std::string getGoATPrefix();
     std::string getPhysPrefix();
 
+    std::string getCompleteACQUFile();
+    std::string getCompletePhysicsFile();
+
     void setLastFile(std::string);
     void setLastGoATFile(std::string file);
     void setLastACQUFile(std::string file);
@@ -65,6 +68,9 @@ private:
     std::string ACQU_prefix;
     std::string GoAT_prefix;
     std::string Phys_prefix;
+
+    std::string CompleteACQUFile;
+    std::string CompletePhysicsFile;
 };
 
 
