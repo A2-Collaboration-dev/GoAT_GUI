@@ -60,6 +60,7 @@ private:
     void TakeANap(int ms);
 
     void UpdateCompleteACQU(const char *inputFile);
+    void UpdateCompletePhysics(const char *inputFile);
     void CompleteExperimentDataUpdate(const char *inputFile, const char *outputFile);
     void CompleteExperimentDataCreate(const char *inputFile, const char *outputFile);
 

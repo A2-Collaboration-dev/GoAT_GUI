@@ -18,21 +18,6 @@
 #include "TH1.h"
 
 
-void MainWindow::UpdateCompleteACQU(const char* inputFile)
-{
-    tabLog->AppendTextNL("Complete ACQU being updated.");
-
-    QFile CompleteDataFile(configGUI.getCompleteACQUFile().c_str());
-    if (!CompleteDataFile.exists())
-    {
-        std::cout << "Creating Complete experiment data file." << std::endl;
-        CompleteExperimentDataCreate(inputFile, configGUI.getCompleteACQUFile().c_str());
-    } else {
-        std::cout << "Updating Complete experiment data file." << std::endl;
-        CompleteExperimentDataUpdate(inputFile, configGUI.getCompleteACQUFile().c_str());
-    }
-}
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -283,8 +268,13 @@ void MainWindow::RunGoat()
      * Very important to put this in correct place, or data dublicates may arise
      * Checking if ACQU files was used for calculations before.
     */
-    if(!(std::find(FinishedACQUFiles.begin(), FinishedACQUFiles.end(), this->curFile) != FinishedACQUFiles.end()))
+    //if(!(std::find(FinishedACQUFiles.begin(), FinishedACQUFiles.end(), this->curFile) != FinishedACQUFiles.end()))
+    {
+        TakeANap(100);
         UpdateCompleteACQU(this->curFile.c_str());
+        tabComplete->ReloadRootFile();
+        tabComplete->UpdateGraphicsDetectors();
+    }
 
     TakeANap(5000);
     tabLog->AppendTextNL("Starting " + TabLog::ColorB("GoAT", "BlueViolet") + " with " + TabLog::Color(this->curFile, "DarkOliveGreen"));
@@ -430,6 +420,11 @@ void MainWindow::newPhysicsFile()
     tabRunByRun->updateRootPhysicsFile(PhysicsFilePath.toStdString().c_str());
     tabRunByRun->UpdateGraphicsPhysics();
 
+    /* Update Complete experiment Physics file & update plots */
+    UpdateCompletePhysics(PhysicsFilePath.toStdString().c_str());
+    tabComplete->ReloadRootPhysicsFile();
+    tabComplete->UpdateGraphicsPhysics();
+
     /* Updating with GoAT and Physics file info */
     tabLog->setLabelLastPhys(PhysicsFilePath.toStdString());
     configGUI.setLastPhysFile(PhysicsFilePath.toStdString());
@@ -489,7 +484,7 @@ void MainWindow::on_actionToggle_Plot_lock_triggered()
 void MainWindow::CompleteExperimentDataUpdate(const char *inputFile, const char *outputFile)
 {
 
-    TFile *out = new TFile(outputFile, "RECREATE");
+    TFile *out = new TFile(outputFile, "UPDATE");
     TFile *in = new TFile(inputFile);
     TKey *key;
     TIter nextkey(in->GetListOfKeys());
@@ -517,8 +512,8 @@ void MainWindow::CompleteExperimentDataUpdate(const char *inputFile, const char 
             TIter dnextkey(gDirectory->GetListOfKeys()); // !@#
             while((dKey = (TKey*)dnextkey()))
             {
-                const char *dclassname = key->GetClassName();
-                TClass *dcl = gROOT->GetClass(dclassname);
+                //const char *dclassname = key->GetClassName();
+                //TClass *dcl = gROOT->GetClass(dclassname);
                 TObject *dobj = dKey->ReadObj();
 
                 // TH2 *InHist = (TH2*)dobj;
@@ -537,13 +532,13 @@ void MainWindow::CompleteExperimentDataUpdate(const char *inputFile, const char 
 
                 if (OutHist != NULL)
                 {
-                    std::cout << "Histogram found updating." << obj->GetName() << std::endl;
+                    std::cout << "Histogram found updating." << dobj->GetName() << std::endl;
                     OutHist->Add(InHist);
                     out->cd(obj->GetName());
                     OutHist->Write();
                 } else
                 {
-                    std::cout << "Could not find histogram, adding. " << obj->GetName() << std::endl;
+                    std::cout << "Could not find histogram, adding. " << dobj->GetName() << std::endl;
                     out->cd(obj->GetName());
                     dobj->Write();
                 }
@@ -552,9 +547,22 @@ void MainWindow::CompleteExperimentDataUpdate(const char *inputFile, const char 
 
         if (cl->InheritsFrom("TTree"))
         {
-            //
+            // Do not copy trees
         } else {
-            //
+            // Individual files
+            TH2 *InHist = (TH2*)obj;
+            TH2 *OutHist = (TH2*)out->Get( obj->GetName() );
+            if (OutHist != NULL)
+            {
+                std::cout << "Doing individual updating" << std::endl;
+                OutHist->Add(InHist);
+                out->cd();
+                OutHist->Write();
+            } else {
+                std::cout << "Doing individual updating" << std::endl;
+                out->cd();
+                obj->Write();
+            }
         }
     }
     in->Close();
@@ -582,7 +590,7 @@ void MainWindow::CompleteExperimentDataCreate(const char *inputFile, const char 
         currentDir = in;
         if (cl->InheritsFrom("TDirectory"))
         {
-            //std::cout << "\t(directory above)" << std::endl;
+            std::cout << "\t(directory above)" << std::endl;
 
             currentDir->cd(obj->GetName());
             out->mkdir(obj->GetName());
@@ -591,8 +599,8 @@ void MainWindow::CompleteExperimentDataCreate(const char *inputFile, const char 
             TIter dnextkey(gDirectory->GetListOfKeys()); // !@#
             while((dKey = (TKey*)dnextkey()))
             {
-                const char *dclassname = key->GetClassName();
-                TClass *dcl = gROOT->GetClass(dclassname);
+                //const char *dclassname = key->GetClassName();
+                //TClass *dcl = gROOT->GetClass(dclassname);
                 TObject *dobj = dKey->ReadObj();
 
                 std::cout << "Copying: " << dobj->GetName() <<std::endl;
@@ -604,11 +612,46 @@ void MainWindow::CompleteExperimentDataCreate(const char *inputFile, const char 
 
         if (cl->InheritsFrom("TTree"))
         {
-            //
+            // Do not copy trees
         } else {
-            //
+            // Individual objects not in folder
+            std::cout << "Doing individual creating" << std::endl;
+            out->cd();
+            obj->Write();
         }
     }
     in->Close();
     out->Close();
+}
+
+void MainWindow::UpdateCompleteACQU(const char* inputFile)
+{
+    tabLog->AppendTextNL(TabLog::Color("Complete ACQU", "DarkOrange") + "  histograms are being updated.");
+    TakeANap(100);
+
+    QFile CompleteDataFile(configGUI.getCompleteACQUFile().c_str());
+    if (!CompleteDataFile.exists())
+    {
+        std::cout << "Creating Complete experiment data file." << std::endl;
+        CompleteExperimentDataCreate(inputFile, configGUI.getCompleteACQUFile().c_str());
+    } else {
+        std::cout << "Updating Complete experiment data file." << std::endl;
+        CompleteExperimentDataUpdate(inputFile, configGUI.getCompleteACQUFile().c_str());
+    }
+}
+
+void MainWindow::UpdateCompletePhysics(const char* inputFile)
+{
+    tabLog->AppendTextNL(TabLog::Color("Complete Physics", "DarkOrange") + "  histograms are being updated.");
+    TakeANap(100);
+
+    QFile CompleteDataFile(configGUI.getCompletePhysicsFile().c_str());
+    if (!CompleteDataFile.exists())
+    {
+        std::cout << "Creating Complete physics data file." << std::endl;
+        CompleteExperimentDataCreate(inputFile, configGUI.getCompletePhysicsFile().c_str());
+    } else {
+        std::cout << "Updating Complete physics data file." << std::endl;
+        CompleteExperimentDataUpdate(inputFile, configGUI.getCompletePhysicsFile().c_str());
+    }
 }

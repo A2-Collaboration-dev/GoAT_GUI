@@ -110,7 +110,6 @@ void TabRunByRun::updateRootFile(const char* ifile)
         std::cout << "not okay" << std::endl;
 
     std::cout << "end of update root file" << std::endl;
-
 }
 
 void TabRunByRun::UpdateAllGraphics()
