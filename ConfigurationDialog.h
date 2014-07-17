@@ -143,6 +143,12 @@ private slots:
     void on_lineEditConfigMRWidthPi0_editingFinished();
     void on_lineEditConfigMRWidthEta_editingFinished();
     void on_lineEditConfigMRWidthEtaprime_editingFinished();
+    void on_comboBoxPS1_currentIndexChanged(int index);
+    void on_lineEditPSNum1_editingFinished();
+    void on_lineEditPSMin1_editingFinished();
+    void on_lineEditPSMax1_editingFinished();
+    void on_comboBoxPSSortN_currentIndexChanged(int index);
+    void on_lineEditPSSortN_editingFinished();
 };
 
 

@@ -111,7 +111,7 @@ void TabComplete::FillWidget(TQtWidget *Twidget, TFile* tfile, std::string detec
         h2 = (TH2F*)tfile->Get(histList[i].c_str());
         if (h2 == nullptr)
             continue;
-        h2->Draw();
+        h2->Draw("colz");
         //h2->DrawNormalized();
     }
 

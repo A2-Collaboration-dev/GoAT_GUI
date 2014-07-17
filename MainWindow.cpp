@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    TransientState = false;
 
 
     /*
@@ -76,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->OpeningAtempt = 0;
     this->watcher = new QFileSystemWatcher(this);
     this->watcher->addPath(this->configGUI.getACQUDir().c_str());
-    connect(watcher, SIGNAL(directoryChanged(const QString &)), this, SLOT(ACQUdirChanged(const QString &))); 
+    connect(watcher, SIGNAL(directoryChanged(const QString &)), this, SLOT(ACQUdirChanged2(const QString &)));
 
     /*
      * Signal of when GoAT is finished
@@ -100,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tabLog->getButtonKillGoAT(), SIGNAL(clicked()), this, SLOT(killGoatProcess()));
     connect(tabLog->getButtonRunPhys(), SIGNAL(clicked()), this, SLOT(ForceRunPhysics()));
     connect(tabLog->getButtonKillPhys(), SIGNAL(clicked()), this, SLOT(killPhysicsProcess()));
+    connect(tabLog->getButtonList(), SIGNAL(clicked()), this, SLOT(ListQueue()));
 
     this->tabLog->AppendTextNL("GUI Initialized.");
 
@@ -117,6 +119,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     std::cout << configGUI.getCompleteACQUFile() << std::endl;
     std::cout << configGUI.getCompletePhysicsFile() << std::endl;
+
+    /* Excluding all current files in ACQU directory */
+    ExcludeFiles(configGUI.getACQUDir(), "*.root");
 
 }
 
@@ -142,34 +147,106 @@ void MainWindow::FileChecker()
 
 }
 
+void MainWindow::ACQUdirChanged2(QString path)
+{
+
+    std::cout << "Queue:" << std::endl;
+    foreach(std::string s, ACQUFilesQueue)
+    {
+        std::cout << s << std::endl;
+    }
+
+    std::string newFile = this->getNewestFile(configGUI.getACQUDir(), "*.root");
+
+    if (newFile == "") goto StartQueue;
+
+    if(!(std::find(ACQUFilesQueue.begin(), ACQUFilesQueue.end(), newFile) != ACQUFilesQueue.end())) {
+        ACQUFilesQueue.push_back(newFile);
+        tabLog->AppendTextNL("New file detected: " + TabLog::Color(newFile, "DarkOliveGreen"));
+        if (ACQUFilesQueue.size() == 1)
+            tabLog->AppendTextNL(TabLog::ColorB("GoAT", "BlueViolet") + " is already running or GUI is busy. File added to queue: " + TabLog::Color(newFile, "DarkOliveGreen")  + " [" + std::to_string(ACQUFilesQueue.size()) + "]");
+        std::cout << "file in queue" + newFile << std::endl;
+    }
+
+    StartQueue:
+    if ((this->GoATProcess->state() == QProcess::NotRunning) && (this->PhysicsProcess->state() == QProcess::NotRunning) && (TransientState == false) && !ACQUFilesQueue.empty())
+    {
+        this->curFile = this->ACQUFilesQueue[0];
+        this->ACQUFilesQueue.erase(ACQUFilesQueue.begin());
+        tabLog->setLabelLastACQU(this->curFile);
+        configGUI.setLastACQUFile(this->curFile);
+        std::cout << "Starting GoAT" << std::endl;
+        RunGoat();
+    }
+
+}
+
 void MainWindow::ACQUdirChanged(QString path)
 {
-    if (path.isEmpty())
-        return;
 
-    std::string newFile = getNewestFile(configGUI.getACQUDir(), "*.root");
+    std::cout << "Queue:" << std::endl;
+    foreach(std::string s, ACQUFilesQueue)
+    {
+        std::cout << s << std::endl;
+    }
+
+    std::cout << std::endl;
+    //if (path.isEmpty())
+    //    return;
+
+    std::cout << path.toStdString() << std::endl;
+
+    std::string newFile = this->getNewestFile(configGUI.getACQUDir(), "*.root");
 
     /* Checking if this file was already used before */
 
-    if((std::find(FinishedACQUFiles.begin(), FinishedACQUFiles.end(), newFile) != FinishedACQUFiles.end()))
+   // if((std::find(FinishedACQUFiles.begin(), FinishedACQUFiles.end(), newFile) != FinishedACQUFiles.end()))
+    //{
+    //    tabLog->AppendTextNL("File was already used in GoAT: " + TabLog::Color(newFile, "DarkOliveGreen"));
+    //    return;
+    //}
+
+//    if (newFile == "" && this->OpeningAtempt == 0)
+//        return;
+
+    if (newFile == "" && this->OpeningAtempt == 0)
     {
-        tabLog->AppendTextNL("File was already used in GoAT: " + TabLog::Color(newFile, "DarkOliveGreen"));
-        return;
+        /* Get the first file from the queue */
+        if (!this->ACQUFilesQueue.empty())
+        {
+            this->curFile = this->ACQUFilesQueue[0];
+            this->ACQUFilesQueue.erase(ACQUFilesQueue.begin());
+            tabLog->setLabelLastACQU(this->curFile);
+            configGUI.setLastACQUFile(this->curFile);
+
+           // tabRunByRun->updateRootFile(this->curFile.c_str());
+           // tabRunByRun->UpdateGraphicsDetectors();
+            std::cout << "acqu files list" << std::endl;
+            TransientState = true;
+            RunGoat();
+            return;
+        }
     }
 
-
-
-
-    if ((newFile != this->curFile && newFile != "") || this->OpeningAtempt > 0)
+    if ((1==1) || this->OpeningAtempt > 0)
     {
         if ((((this->GoATProcess->state() == QProcess::NotRunning) && (this->PhysicsProcess->state() == QProcess::NotRunning)) || (OpeningAtempt > 0))) // (not needed?)
         {
             /* Attempt to open the file that was being used by another program */
             if (this->OpeningAtempt > 0)
             {
-                //RunGoat() is already dealing recursively with this case;
+
+                if (newFile == "") return;
+                if(!(std::find(ACQUFilesQueue.begin(), ACQUFilesQueue.end(), newFile) != ACQUFilesQueue.end())) {
+                    ACQUFilesQueue.push_back(newFile);
+                    tabLog->AppendTextNL("New file detected: " + TabLog::Color(newFile, "DarkOliveGreen"));
+                    tabLog->AppendTextNL(TabLog::ColorB("GoAT", "BlueViolet") + " is already running or GUI is busy. File added to queue: " + TabLog::Color(newFile, "DarkOliveGreen")  + " [" + std::to_string(ACQUFilesQueue.size()) + "]");
+                    std::cout << "file in queue" + newFile << std::endl;
+                }
                 return;
             }
+            if (TransientState)
+                return;
 
             tabLog->AppendTextNL("New file detected: " + TabLog::Color(newFile, "DarkOliveGreen"));
 
@@ -184,6 +261,7 @@ void MainWindow::ACQUdirChanged(QString path)
                // tabRunByRun->updateRootFile(this->curFile.c_str());
                // tabRunByRun->UpdateGraphicsDetectors();
                 std::cout << "acqu files list" << std::endl;
+                TransientState = true;
                 RunGoat();
                 return;
             }
@@ -196,6 +274,7 @@ void MainWindow::ACQUdirChanged(QString path)
             //tabRunByRun->updateRootFile(this->curFile.c_str());
             //tabRunByRun->UpdateGraphicsDetectors();
             std::cout << "standard call" << std::endl;
+            TransientState = true;
             RunGoat();
             return;
 
@@ -204,7 +283,7 @@ void MainWindow::ACQUdirChanged(QString path)
             if(!(std::find(ACQUFilesQueue.begin(), ACQUFilesQueue.end(), newFile) != ACQUFilesQueue.end())) {
                 ACQUFilesQueue.push_back(newFile);
                 tabLog->AppendTextNL("New file detected: " + TabLog::Color(newFile, "DarkOliveGreen"));
-                tabLog->AppendTextNL(TabLog::ColorB("GoAT", "BlueViolet") + " is already running. File added to queue: " + TabLog::Color(newFile, "DarkOliveGreen")  + " [" + std::to_string(ACQUFilesQueue.size()) + "]");
+                tabLog->AppendTextNL(TabLog::ColorB("GoAT", "BlueViolet") + " is already running or GUI is busy. File added to queue: " + TabLog::Color(newFile, "DarkOliveGreen")  + " [" + std::to_string(ACQUFilesQueue.size()) + "]");
                 std::cout << "file in queue" + newFile << std::endl;
             }
         }
@@ -227,11 +306,15 @@ void MainWindow::RunGoat()
     // are we attempting to check file?
     if (this->OpeningAtempt >= MaxContinueAttempts)
     {
-        tabLog->AppendText1L("File Error: ", "DarkMagenta", "Could not open " + this->curFile + ". Possible causes: file is still being copied or is corrupted.");
+        tabLog->AppendText1L("File Error: ", "DarkMagenta", "Could not open " + this->curFile + ". File added to the end of the queue.");
         this->OpeningAtempt = 0;
+        TransientState = false;
+        ACQUFilesQueue.push_back(this->curFile);
+        ACQUdirChanged2("check_for_new_file && FINISH");
         return;
     }
 
+    TransientState = true;
     *GoATarguments << "-f" << this->curFile.c_str()
                    << "-D" << configGUI.getGoATDir().c_str()
                    << "-p" << configGUI.getACQUPrefix().c_str()
@@ -243,15 +326,18 @@ void MainWindow::RunGoat()
      */
 
     QFileInfo qfile(this->curFile.c_str());
+    //this->FinishedACQUFiles.push_back(this->curFile); // Experimental
 
-    /* Check if files was modified in 5 seconds, else use it */
+    /* Check if files was
+     *  modified in 5 seconds, else use it */
     if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-2))
     {
         tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
         std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
         this->OpeningAtempt++;
+        //ACQUdirChanged2("check_for_new_file"); // EXP
         TakeANap(5000);
-        this->FinishedACQUFiles.push_back(this->curFile);
+        //this->FinishedACQUFiles.push_back(this->curFile);
         this->RunGoat();
         return;
     }
@@ -282,8 +368,9 @@ void MainWindow::RunGoat()
     if (this->GoATProcess->state() == QProcess::NotRunning && this->PhysicsProcess->state() == QProcess::NotRunning)
     {
         std::cout << "starting GoAT" << std::endl;
-        this->FinishedACQUFiles.push_back(this->curFile);
+        //this->FinishedACQUFiles.push_back(this->curFile);
         GoATProcess->start(configGUI.getGoATExe().c_str(), *GoATarguments);
+        TransientState = false;
     }
 
 
@@ -340,6 +427,7 @@ void MainWindow::ForceRunPhysics()
 
 void MainWindow::newGoatFile()
 {
+    TransientState = false;
     QString p_stdout = GoATProcess->readAllStandardOutput();
     QString p_stderr = GoATProcess->readAllStandardError();
     QString pa = GoATProcess->readAll();
@@ -377,7 +465,7 @@ void MainWindow::newGoatFile()
                           << "-P" << configGUI.getPhysPrefix().c_str()
                           << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
-        TakeANap(1000);
+        //TakeANap(1000);
 
         tabLog->AppendTextNL("Starting " + TabLog::ColorB("Physics Analysis", "RoyalBlue ") + " with: " + TabLog::Color(GoATFilePath.toStdString(), "DarkOliveGreen"));
 
@@ -554,12 +642,12 @@ void MainWindow::CompleteExperimentDataUpdate(const char *inputFile, const char 
             TH2 *OutHist = (TH2*)out->Get( obj->GetName() );
             if (OutHist != NULL)
             {
-                std::cout << "Doing individual updating" << std::endl;
+                std::cout << "Doing individual updating " << obj->GetName() <<  std::endl;
                 OutHist->Add(InHist);
                 out->cd();
                 OutHist->Write();
             } else {
-                std::cout << "Doing individual updating" << std::endl;
+                std::cout << "Doing individual updating " << obj->GetName() << std::endl;
                 out->cd();
                 obj->Write();
             }
@@ -626,7 +714,8 @@ void MainWindow::CompleteExperimentDataCreate(const char *inputFile, const char 
 
 void MainWindow::UpdateCompleteACQU(const char* inputFile)
 {
-    tabLog->AppendTextNL(TabLog::Color("Complete ACQU", "DarkOrange") + "  histograms are being updated.");
+    tabLog->AppendTextNL(TabLog::ColorB("Complete ", "DarkOrange") + TabLog::ColorB("ACQU", "CadetBlue") + "  histograms are being updated: " + TabLog::Color(inputFile, "DarkOliveGreen"));
+
     TakeANap(100);
 
     QFile CompleteDataFile(configGUI.getCompleteACQUFile().c_str());
@@ -642,7 +731,7 @@ void MainWindow::UpdateCompleteACQU(const char* inputFile)
 
 void MainWindow::UpdateCompletePhysics(const char* inputFile)
 {
-    tabLog->AppendTextNL(TabLog::Color("Complete Physics", "DarkOrange") + "  histograms are being updated.");
+    tabLog->AppendTextNL(TabLog::ColorB("Complete ", "DarkOrange") + TabLog::ColorB("Physics", "RoyalBlue") + "  histograms are being updated: " + TabLog::Color(inputFile, "DarkOliveGreen"));
     TakeANap(100);
 
     QFile CompleteDataFile(configGUI.getCompletePhysicsFile().c_str());
@@ -653,5 +742,74 @@ void MainWindow::UpdateCompletePhysics(const char* inputFile)
     } else {
         std::cout << "Updating Complete physics data file." << std::endl;
         CompleteExperimentDataUpdate(inputFile, configGUI.getCompletePhysicsFile().c_str());
+    }
+}
+
+std::string MainWindow::getNewestFile(std::string iDirIn, char* extension)
+{
+    std::cout << "getNewestfile called MM" << std::endl;
+    QString iDir = QString(iDirIn.c_str());
+    QDir dir;
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    dir.setSorting(QDir::Time);
+    dir.setCurrent(iDir);
+
+    QStringList filters;
+    filters << extension;
+    dir.setNameFilters(filters);
+
+    QFileInfoList list = dir.entryInfoList();
+
+    if (list.empty())
+        return "";
+
+    foreach(QFileInfo f, list)
+    {
+        if(!(std::find(FinishedACQUFiles.begin(), FinishedACQUFiles.end(), f.absoluteFilePath().toStdString()) != FinishedACQUFiles.end()))
+        {
+            FinishedACQUFiles.push_back(f.absoluteFilePath().toStdString());
+            std::cout << "returning: " << f.absoluteFilePath().toStdString() << std::endl;
+            return f.absoluteFilePath().toStdString();
+        }
+
+    }
+
+    return "";
+}
+
+void MainWindow::ExcludeFiles(std::string iDirIn, char* extension)
+{
+    QString iDir = QString(iDirIn.c_str());
+    QDir dir;
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    dir.setSorting(QDir::Time);
+    dir.setCurrent(iDir);
+
+    QStringList filters;
+    filters << extension;
+    dir.setNameFilters(filters);
+
+    QFileInfoList list = dir.entryInfoList();
+
+    if (list.empty())
+        return;
+
+    foreach(QFileInfo f, list)
+    {
+        /* Do not exclude newest file */
+        if (f == list.first())
+            continue;
+
+        FinishedACQUFiles.push_back(f.absoluteFilePath().toStdString());
+        std::cout << "Excluded: " << f.absoluteFilePath().toStdString() << std::endl;
+    }
+}
+
+void MainWindow::ListQueue()
+{
+    tabLog->AppendTextNL(TabLog::ColorB("Files Queue:", "DarkOliveGreen ") );
+    foreach(std::string s, ACQUFilesQueue)
+    {
+        tabLog->AppendTextNL(s.c_str());
     }
 }

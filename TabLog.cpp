@@ -122,6 +122,11 @@ QPushButton* TabLog::getButtonKillPhys()
     return ui->buttonKillPhys;
 }
 
+QPushButton* TabLog::getButtonList()
+{
+    return ui->buttonList;
+}
+
 void TabLog::WriteLogToFile()
 {
     std::ofstream outfile (QCoreApplication::applicationDirPath().toStdString() + std::string("/logs/" + LogFileName + ".txt"), std::ofstream::binary);

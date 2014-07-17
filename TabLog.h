@@ -45,6 +45,7 @@ public:
     QPushButton* getButtonKillGoAT();
     QPushButton* getButtonRunPhys();
     QPushButton* getButtonKillPhys();
+    QPushButton* getButtonList();
 
 private:
     Ui::TabLog *ui;

@@ -193,7 +193,7 @@ void TabRunByRun::FillWidget(TQtWidget *Twidget,TFile* tfile, std::string detect
         h2 = (TH2F*)tfile->Get(histList[i].c_str());
         if (h2 == nullptr)
             continue;
-        h2->Draw();
+        h2->Draw("colz");
     }
 
     Twidget->Refresh();

@@ -532,6 +532,26 @@ void ConfigurationDialog::updateUIText()
         ui->checkBoxCMR->setChecked(true);
     }
 
+
+    if (configFile.getSortNParticles() != ConfigFile::nullValue && configFile.getSortNParticles().length() > 0)
+    {
+        ui->lineEditPSSortN->setText(configFile.getSortNParticles().substr(0, configFile.getSortNParticles().length() - 1).c_str());
+        ui->comboBoxPSSortN->setCurrentIndex(InverseResolvingBoxIndex(configFile.getSortNParticles().substr(configFile.getSortNParticles().length()-1, 1)));
+    }
+
+    if (configFile.getPSpi0Number()!= ConfigFile::nullValue && configFile.getPSpi0Number().length() > 0)
+    {
+        ui->lineEditPSNum1->setText(configFile.getPSpi0Number().substr(0, configFile.getPSpi0Number().length()-1).c_str());
+        ui->lineEditPSMin1->setText(configFile.getPSpi0AMin().c_str());
+        ui->lineEditPSMax1->setText(configFile.getPSpi0AMax().c_str());
+        ui->comboBoxPS1->setCurrentIndex(InverseResolvingBoxIndex(configFile.getPSpi0Number().substr(configFile.getPSpi0Number().length()-1, 1)));
+    }
+
+    if (configFile.getSortNParticles() != ConfigFile::nullValue)
+    {
+        ui->checkBoxCPS->setChecked(true);
+    }
+
     ui->pushButton->setEnabled(true);
 
 }
@@ -554,3 +574,37 @@ void ConfigurationDialog::on_lineEditConfigMRWidthEtaprime_editingFinished()
     configFile.setCut_IM_Width_Eta_Prime(ui->lineEditConfigMRWidthEtaprime->text().toStdString());
 }
 
+
+void ConfigurationDialog::on_comboBoxPS1_currentIndexChanged(int index)
+{
+    configFile.setPSpi0Number(resolvingComboBoxIndex(index),
+                              ui->lineEditPSNum1->text().toStdString());
+}
+
+void ConfigurationDialog::on_lineEditPSNum1_editingFinished()
+{
+    configFile.setPSpi0Number(resolvingComboBoxIndex(ui->comboBoxPS1->currentIndex()),
+                              ui->lineEditPSNum1->text().toStdString());
+}
+
+void ConfigurationDialog::on_lineEditPSMin1_editingFinished()
+{
+    configFile.setPSpi0AMin(ui->lineEditPSMin1->text().toStdString());
+}
+
+void ConfigurationDialog::on_lineEditPSMax1_editingFinished()
+{
+    configFile.setPSpi0AMax(ui->lineEditPSMax1->text().toStdString());
+}
+
+void ConfigurationDialog::on_comboBoxPSSortN_currentIndexChanged(int index)
+{
+    configFile.setSortNParticles(resolvingComboBoxIndex(index),
+                                 ui->lineEditPSSortN->text().toStdString());
+}
+
+void ConfigurationDialog::on_lineEditPSSortN_editingFinished()
+{
+    configFile.setSortNParticles(resolvingComboBoxIndex(ui->comboBoxPSSortN->currentIndex()),
+                                 ui->lineEditPSSortN->text().toStdString());
+}

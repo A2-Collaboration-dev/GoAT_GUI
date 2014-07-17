@@ -81,32 +81,32 @@ static std::string GUISettingsGet(std::string lookupKey)
 }
 */
 
-static std::string getNewestFile(std::string iDirIn, char* extension)
-{
-    QString iDir = QString(iDirIn.c_str());
-    QDir dir;
-    dir.setFilter(QDir::Files | QDir::NoSymLinks);
-    dir.setSorting(QDir::Time);
-    dir.setCurrent(iDir);
+//static std::string getNewestFile(std::string iDirIn, char* extension)
+//{
+//    QString iDir = QString(iDirIn.c_str());
+//    QDir dir;
+//    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+//    dir.setSorting(QDir::Time);
+//    dir.setCurrent(iDir);
 
-    QStringList filters;
-    filters << extension;
-    dir.setNameFilters(filters);
+//    QStringList filters;
+//    filters << extension;
+//    dir.setNameFilters(filters);
 
-    QFileInfoList list = dir.entryInfoList();
+//    QFileInfoList list = dir.entryInfoList();
 
-    /*
-    foreach(QFileInfo f, list)
-    {
-        std::cout << f.fileName().toStdString() << std::endl;
-    }
-    */
+//    /*
+//    foreach(QFileInfo f, list)
+//    {
+//        std::cout << f.fileName().toStdString() << std::endl;
+//    }
+//    */
 
-    if (list.empty())
-        return "";
+//    if (list.empty())
+//        return "";
 
-    //std::cout << "out "<<list.at(0).fileName().toStdString() << std::endl;
-    return (list.at(0).absoluteFilePath().toStdString());
-}
+//    //std::cout << "out "<<list.at(0).fileName().toStdString() << std::endl;
+//    return (list.at(0).absoluteFilePath().toStdString());
+//}
 
 #endif //FUNCTA_H

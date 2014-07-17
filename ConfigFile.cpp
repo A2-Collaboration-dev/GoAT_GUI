@@ -35,6 +35,10 @@ Period-Macro:	100000\n\n",
 
 "\n#----------------------------------------------------------------------\n\
 # Time Cuts\n\
+#-----------------------------------------------------------------------\n",
+
+"\n#---------------------------------------------------------------------\n\
+# Sort on reconstructed particle properties\n\
 #-----------------------------------------------------------------------\n"
 };
 
@@ -118,6 +122,19 @@ void ConfigFile::loadGoATConfigFile(std::string config_file)
     this->TimeCutMinApparatus2 = ReadConfig("TimeCutMin2",0,(Char_t*)config_file.c_str());
     this->TimeCutMaxApparatus2 = ReadConfig("TimeCutMax2",0,(Char_t*)config_file.c_str());
 
+    this->SortNParticles = ReadConfig("Sort-NParticles",0,(Char_t*)config_file.c_str());
+
+    flag = ReadConfig("Sort-Particle",0,(Char_t*)config_file.c_str());
+    flag.erase(0, flag.find_first_of(" \t")); // thats just pi0 string
+    flag.erase(0, flag.find_first_of("0123456789"));
+    this->pi0Number = flag.substr(0, flag.find_first_of(" \t"));
+    flag.erase(0, flag.find_first_of(" \t"));
+    flag.erase(0, flag.find_first_of("0123456789"));
+    this->pi0AMin = flag.substr(0, flag.find_first_of(" \t"));
+    flag.erase(0, flag.find_first_of(" \t"));
+    flag.erase(0, flag.find_first_of("0123456789"));
+    this->pi0AMax = flag.substr(0, flag.find_first_of(" \t \n"));
+
 }
 
 void ConfigFile::writeGoATConfigFile(const std::string filename)
@@ -171,8 +188,6 @@ void ConfigFile::writeGoATConfigFile(const std::string filename)
 
     if (this->SortRawCBEnergySum != nullValue)
         outputData.append("SortRaw-CBEnergySum: ").append(this->SortRawCBEnergySum).append("\n");
-    if (this->SortNParticles != nullValue)
-        outputData.append("Sort-NParticles: ").append(this->SortNParticles).append("\n");
 
     outputData.append(TextFields[4]);
     if (this->TimeCutMinApparatus1 != nullValue)
@@ -183,6 +198,19 @@ void ConfigFile::writeGoATConfigFile(const std::string filename)
         outputData.append("TimeCutMin2: ").append(this->TimeCutMinApparatus2).append("\n");
     if (this->TimeCutMaxApparatus2 != nullValue)
         outputData.append("TimeCutMax2: ").append(this->TimeCutMaxApparatus2).append("\n");
+
+    outputData.append(TextFields[5]);
+    if(this->SortNParticles != nullValue && std::atoi(this->SortNParticles.c_str()) != 0)
+        outputData.append("Sort-NParticles:").append("\t\t").append(this->SortNParticles).append("\n");
+
+    if(this->pi0Number != nullValue &&
+       this->pi0AMin != nullValue &&
+       this->pi0AMax != nullValue &&
+       std::atoi(this->pi0Number.c_str()) != 0)
+        outputData.append("Sort-Particle:	pi0	").append("\t")
+                  .append(this->pi0Number).append("\t\t")
+                  .append(this->pi0AMin).append("\t\t")
+                  .append(this->pi0AMax).append("\n");
 
     outfile.write (outputData.c_str(),outputData.size());
     outfile.close();
@@ -380,6 +408,36 @@ void ConfigFile::setTimeCutMaxApparatus2(std::string s)
     this->TimeCutMaxApparatus2 = s;
 }
 
+void ConfigFile::setSortNParticles(std::string sign, string str)
+{
+    this->SortNParticles = str + sign;
+}
+
+void ConfigFile::setSortNParticlesSign(std::string s)
+{
+    this->SortNParticlesSign = s;
+}
+
+void ConfigFile::setPSpi0Sign(std::string s)
+{
+    this->pi0Sign = s;
+}
+
+void ConfigFile::setPSpi0Number(std::string sign, std::string str)
+{
+    this->pi0Number = str + sign;
+}
+
+void ConfigFile::setPSpi0AMin(std::string s)
+{
+    this->pi0AMin = s;
+}
+
+void ConfigFile::setPSpi0AMax(std::string s)
+{
+    this->pi0AMax = s;
+}
+
 std::string ConfigFile::getParticleReconstruction()
 {
     return this->ParticleReconstruction;
@@ -490,4 +548,35 @@ std::string ConfigFile::getTimeCutMinApparatus2()
 std::string ConfigFile::getTimeCutMaxApparatus2()
 {
     return this->TimeCutMaxApparatus2;
+}
+
+/* Post Reconstruction */
+std::string ConfigFile::getPSpi0Sign()
+{
+    return this->pi0Sign;
+}
+
+std::string ConfigFile::getPSpi0Number()
+{
+    return this->pi0Number;
+}
+
+std::string ConfigFile::getPSpi0AMin()
+{
+    return this->pi0AMin;
+}
+
+std::string ConfigFile::getPSpi0AMax()
+{
+    return this->pi0AMax;
+}
+
+std::string ConfigFile::getSortNParticles()
+{
+    return this->SortNParticles;
+}
+
+std::string ConfigFile::getSortNParticlesSign()
+{
+    return this->SortNParticlesSign;
 }

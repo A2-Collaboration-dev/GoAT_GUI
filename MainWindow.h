@@ -89,10 +89,14 @@ private:
     QWaitCondition waitCondition;
     QMutex mutex;
 
+    bool TransientState;
+
 
 private slots:
 
   void ACQUdirChanged(QString path);
+    void ACQUdirChanged2(QString path);
+  void ListQueue();
   void newGoatFile();
   void newPhysicsFile();
   void ForceRunGoAT();
@@ -103,6 +107,9 @@ private slots:
   void RunGoat();
   void ExitingGoat();
   void on_actionToggle_Plot_lock_triggered();
+
+  std::string getNewestFile(std::string iDirIn, char* extension);
+  void ExcludeFiles(std::string iDirIn, char* extension);
 };
 
 #endif // MAINWINDOW_H

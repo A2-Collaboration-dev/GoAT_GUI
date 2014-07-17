@@ -44,12 +44,21 @@ private:
 
     /* Sort on reconstructed Particles */
     std::string SortNParticles;
+    std::string SortNParticlesSign;
+
+    std::string pi0Sign;
+    std::string pi0Number;
+    std::string pi0AMin;
+    std::string pi0AMax;
+
 
     /* Cuts */
     std::string TimeCutMinApparatus1;
     std::string TimeCutMaxApparatus1;
     std::string TimeCutMinApparatus2;
     std::string TimeCutMaxApparatus2;
+
+
 
 
 public:
@@ -85,6 +94,15 @@ public:
     void setCut_IM_Width_Eta(std::string str);
     void setCut_IM_Width_Eta_Prime(std::string str);
 
+    /* Post Reconstruction */
+    void setSortNParticles(std::string, std::string);
+    void setSortNParticlesSign(std::string);
+
+    void setPSpi0Sign(std::string);
+    void setPSpi0Number(std::string, std::string);
+    void setPSpi0AMin(std::string);
+    void setPSpi0AMax(std::string);
+
     /* Cuts */
     void setTimeCutMinApparatus1(std::string);
     void setTimeCutMaxApparatus1(std::string);
@@ -119,6 +137,15 @@ public:
     std::string getTimeCutMinApparatus2();
     std::string getTimeCutMaxApparatus2();
 
+    /* Post Reconstruction */
+
+    std::string getSortNParticles();
+    std::string getSortNParticlesSign();
+
+    std::string getPSpi0Sign();
+    std::string getPSpi0Number();
+    std::string getPSpi0AMin();
+    std::string getPSpi0AMax();
 
     void loadGoATConfigFile(const char* config_file);
     void loadGoATConfigFile(const std::string config_file);

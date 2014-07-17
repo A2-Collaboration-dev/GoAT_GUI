@@ -105,8 +105,8 @@ void ConfigGUI::writeGUIConfigFile(const std::string filename)
     std::ofstream outfile (filename.c_str(), std::ofstream::binary);
     std::string outputData("");
 
-    if (this->GoAT_Config != nullValue)
-        outputData.append("GoAT-Config: ").append(this->GoAT_Config).append("\n");
+    //if (this->GoAT_Config != nullValue)
+    //    outputData.append("GoAT-Config: ").append(this->GoAT_Config).append("\n");
     if (this->GoAT_Exe != nullValue)
         outputData.append("GoAT-Executable: ").append(this->GoAT_Exe).append("\n");
     if (this->Phys_Exe != nullValue)
