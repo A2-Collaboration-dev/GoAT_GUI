@@ -60,6 +60,20 @@ p, li { white-space: pre-wrap; }
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="buttonEditQueue">
+              <property name="text">
+               <string>Edit Queue</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="buttonStartQueue">
+              <property name="text">
+               <string>Start Queue</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>

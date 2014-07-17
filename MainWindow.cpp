@@ -43,6 +43,11 @@ MainWindow::MainWindow(QWidget *parent) :
     tabLog = new TabLog(parent);
 
     /*
+     * Must initialize to connect buttons.
+     */
+    queueEditDialog = new QueueEditDialog(this);
+
+    /*
      * Constructing control tab widget
      */
     ui->tabWidget->addTab(tabRunByRun, QString("Run By Run"));
@@ -102,6 +107,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tabLog->getButtonRunPhys(), SIGNAL(clicked()), this, SLOT(ForceRunPhysics()));
     connect(tabLog->getButtonKillPhys(), SIGNAL(clicked()), this, SLOT(killPhysicsProcess()));
     connect(tabLog->getButtonList(), SIGNAL(clicked()), this, SLOT(ListQueue()));
+    connect(tabLog->getButtonStartQueue(), SIGNAL(clicked()), this, SLOT(StartQueue()));
+
+    /*
+     * Connecting QueueEditDialog
+     */
+    connect(tabLog->getButtonEditQueue(), SIGNAL(clicked()), this, SLOT(EditQueueDialog()));
+    connect(queueEditDialog->getButtonSave(), SIGNAL(clicked()), this, SLOT(QueueDialogConfirm()));
 
     this->tabLog->AppendTextNL("GUI Initialized.");
 
@@ -120,9 +132,10 @@ MainWindow::MainWindow(QWidget *parent) :
     std::cout << configGUI.getCompleteACQUFile() << std::endl;
     std::cout << configGUI.getCompletePhysicsFile() << std::endl;
 
-    /* Excluding all current files in ACQU directory */
+    /*
+     * Excluding all current files in ACQU directory except the last
+    */
     ExcludeFiles(configGUI.getACQUDir(), "*.root");
-
 }
 
 
@@ -149,13 +162,6 @@ void MainWindow::FileChecker()
 
 void MainWindow::ACQUdirChanged2(QString path)
 {
-
-    std::cout << "Queue:" << std::endl;
-    foreach(std::string s, ACQUFilesQueue)
-    {
-        std::cout << s << std::endl;
-    }
-
     std::string newFile = this->getNewestFile(configGUI.getACQUDir(), "*.root");
 
     if (newFile == "") goto StartQueue;
@@ -178,7 +184,6 @@ void MainWindow::ACQUdirChanged2(QString path)
         std::cout << "Starting GoAT" << std::endl;
         RunGoat();
     }
-
 }
 
 void MainWindow::ACQUdirChanged(QString path)
@@ -303,6 +308,8 @@ void MainWindow::RunGoat()
 
     int MaxContinueAttempts = 5;
 
+    //check if file exists
+
     // are we attempting to check file?
     if (this->OpeningAtempt >= MaxContinueAttempts)
     {
@@ -313,6 +320,9 @@ void MainWindow::RunGoat()
         ACQUdirChanged2("check_for_new_file && FINISH");
         return;
     }
+
+    if (this->curFile.empty())
+        return;
 
     TransientState = true;
     *GoATarguments << "-f" << this->curFile.c_str()
@@ -647,7 +657,7 @@ void MainWindow::CompleteExperimentDataUpdate(const char *inputFile, const char 
                 out->cd();
                 OutHist->Write();
             } else {
-                std::cout << "Doing individual updating " << obj->GetName() << std::endl;
+                std::cout << "Doing individual updating " <<   obj->GetName() << std::endl;
                 out->cd();
                 obj->Write();
             }
@@ -812,4 +822,21 @@ void MainWindow::ListQueue()
     {
         tabLog->AppendTextNL(s.c_str());
     }
+}
+
+void MainWindow::EditQueueDialog()
+{
+    queueEditDialog->setModal(true);
+    queueEditDialog->UpdateTextWidget(ACQUFilesQueue);
+    queueEditDialog->exec();
+}
+
+void MainWindow::QueueDialogConfirm()
+{
+    ACQUFilesQueue = queueEditDialog->getNewQueueList();
+}
+
+void MainWindow::StartQueue()
+{
+    this->ACQUdirChanged2("force");
 }

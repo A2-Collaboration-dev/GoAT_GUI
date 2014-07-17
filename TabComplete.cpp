@@ -46,13 +46,13 @@ void TabComplete::UpdateAllGraphics()
 
 void TabComplete::UpdateGraphicsPhysics()
 {
-    std::cout << "updating graphics physics" << std::endl;
+    std::cout << "Complete updating graphics physics" << std::endl;
     FillWidget(ui->widgetPA, PhysicsFile, std::string("PA"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
 }
 
 void TabComplete::UpdateGraphicsDetectors()
 {
-    std::cout << "updating graphics detectors" << std::endl;
+    std::cout << "Complete updating graphics detectors" << std::endl;
     FillWidget(ui->widget, file, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     FillWidget(ui->widgetTaps1, file, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     FillWidget(ui->widgetTaps2, file, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
@@ -161,4 +161,110 @@ void TabComplete::ReloadRootPhysicsFile()
 {
     std::cout << "Reloading Physics File" << std::endl;
     updateRootPhysicsFile(configGUI.getCompletePhysicsFile().c_str());
+}
+void TabComplete::on_buttonTaps1R_clicked()
+{
+    ui->widgetTaps1->GetCanvas()->Clear();
+    ui->scrollArea_2->setWidgetResizable(true);
+    FillWidget(ui->widgetTaps1,file, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+}
+
+void TabComplete::on_buttonTaps2R_clicked()
+{
+    ui->widgetTaps2->GetCanvas()->Clear();
+    ui->scrollArea_3->setWidgetResizable(true);
+    FillWidget(ui->widgetTaps2, file, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+
+}
+
+void TabComplete::on_buttonTaps3R_clicked()
+{
+    ui->widgetTaps3->GetCanvas()->Clear();
+    ui->scrollArea_4->setWidgetResizable(true);
+    FillWidget(ui->widgetTaps3, file, std::string("TAPS3"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+
+}
+
+void TabComplete::on_buttonTaps1Plus_clicked()
+{
+    ui->scrollArea_2->setWidgetResizable(false);
+    ui->widgetTaps1->resize(ui->widgetTaps1->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_2->resize(ui->widgetTaps1->size() + QSize(150, 0));
+}
+
+void TabComplete::on_buttonTaps2Plus_clicked()
+{
+    ui->scrollArea_3->setWidgetResizable(false);
+    ui->widgetTaps2->resize(ui->widgetTaps2->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_3->resize(ui->widgetTaps2->size() + QSize(150, 0));
+}
+
+void TabComplete::on_buttonTaps3Plus_clicked()
+{
+    ui->scrollArea_4->setWidgetResizable(false);
+    ui->widgetTaps3->resize(ui->widgetTaps3->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_4->resize(ui->widgetTaps3->size() + QSize(150, 0));
+}
+
+void TabComplete::on_buttonTaps1Minus_clicked()
+{
+    ui->scrollArea_2->setWidgetResizable(false);
+    ui->widgetTaps1->resize(ui->widgetTaps1->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_2->resize(ui->widgetTaps1->size() + QSize(0, 150));
+}
+
+void TabComplete::on_buttonTaps2Minus_clicked()
+{
+    ui->scrollArea_3->setWidgetResizable(false);
+    ui->widgetTaps2->resize(ui->widgetTaps2->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_3->resize(ui->widgetTaps2->size() + QSize(0, 150));
+}
+
+void TabComplete::on_buttonTaps3Minus_clicked()
+{
+    ui->scrollArea_4->setWidgetResizable(false);
+    ui->widgetTaps3->resize(ui->widgetTaps3->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_4->resize(ui->widgetTaps3->size() + QSize(0, 150));
+}
+
+void TabComplete::on_buttonPAR_clicked()
+{
+    ui->widgetPA->GetCanvas()->Clear();
+    ui->scrollArea_5->setWidgetResizable(true);
+    this->UpdateGraphicsPhysics();
+}
+
+void TabComplete::on_buttonPAPlus_clicked()
+{
+    ui->scrollArea_5->setWidgetResizable(false);
+    ui->widgetPA->resize(ui->widgetPA->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_5->resize(ui->widgetPA->size() + QSize(150, 0));
+}
+
+void TabComplete::on_buttonTapsPAM_clicked()
+{
+    ui->scrollArea_5->setWidgetResizable(false);
+    ui->widgetPA->resize(ui->widgetPA->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_5->resize(ui->widgetPA->size() + QSize(0, 150));
+}
+
+void TabComplete::on_pushButtonZoomIn_clicked()
+{
+    ui->scrollArea->setWidgetResizable(false);
+    ui->widget->resize(ui->widget->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents->resize(ui->widget->size() + QSize(150, 0));
+}
+
+void TabComplete::on_pushButtonZoomOut_clicked()
+{
+    ui->scrollArea->setWidgetResizable(false);
+    ui->widget->resize(ui->widget->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents->resize(ui->widget->size() + QSize(0, 150));
+}
+
+void TabComplete::on_pushButton_clicked()
+{
+    ui->widget->GetCanvas()->Clear();
+    ui->scrollArea->setWidgetResizable(true);
+    FillWidget(ui->widget, file, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
 }

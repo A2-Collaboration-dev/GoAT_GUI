@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     TabRunByRun.cpp \
     TabComplete.cpp \
     ConfigGui.cpp \
-    TabLog.cpp
+    TabLog.cpp \
+    QueueEditDialog.cpp
 
 HEADERS  += \
     MainWindow.h \
@@ -32,14 +33,16 @@ HEADERS  += \
     TabComplete.h \
     ConfigGui.h \
     TabLog.h \
-    Functions.h
+    Functions.h \
+    QueueEditDialog.h
 
 FORMS    += \
     configurationdialog.ui \
     mainwindow.ui \
     tabrunbyrun.ui \
     tabcomplete.ui \
-    tablog.ui
+    tablog.ui \
+    queueeditdialog.ui
 
 
 include("$(ROOTSYS)/include/rootcint.pri")

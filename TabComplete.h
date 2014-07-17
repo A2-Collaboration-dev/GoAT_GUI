@@ -41,6 +41,37 @@ public slots:
         void UpdateGraphicsPhysics();
         void UpdateGraphicsDetectors();
 
+private slots:
+        void on_pushButton_clicked();
+
+        void on_pushButtonZoomIn_clicked();
+
+        void on_pushButtonZoomOut_clicked();
+
+        void on_buttonTaps1R_clicked();
+
+        void on_buttonTaps1Plus_clicked();
+
+        void on_buttonTaps1Minus_clicked();
+
+        void on_buttonTaps2R_clicked();
+
+        void on_buttonTaps2Plus_clicked();
+
+        void on_buttonTaps2Minus_clicked();
+
+        void on_buttonTaps3R_clicked();
+
+        void on_buttonTaps3Plus_clicked();
+
+        void on_buttonTaps3Minus_clicked();
+
+        void on_buttonPAR_clicked();
+
+        void on_buttonPAPlus_clicked();
+
+        void on_buttonTapsPAM_clicked();
+
 private:
     Ui::TabComplete *ui;
 

@@ -9,6 +9,8 @@
 #include "TabComplete.h"
 #include "TabLog.h"
 
+#include "QueueEditDialog.h"
+
 #include "ConfigFile.h"
 #include "ConfigGui.h"
 #include "Functions.h"
@@ -65,6 +67,7 @@ private:
     void CompleteExperimentDataCreate(const char *inputFile, const char *outputFile);
 
     ConfigurationDialog *configurationDialog;
+    QueueEditDialog *queueEditDialog;
 
     TabRunByRun* tabRunByRun;
     TabComplete* tabComplete;
@@ -107,6 +110,9 @@ private slots:
   void RunGoat();
   void ExitingGoat();
   void on_actionToggle_Plot_lock_triggered();
+  void EditQueueDialog();
+  void QueueDialogConfirm();
+  void StartQueue();
 
   std::string getNewestFile(std::string iDirIn, char* extension);
   void ExcludeFiles(std::string iDirIn, char* extension);
