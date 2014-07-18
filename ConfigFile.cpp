@@ -71,8 +71,17 @@ ConfigFile::ConfigFile()
     this->TimeCutMaxApparatus1 = nullValue;
     this->TimeCutMinApparatus2 = nullValue;
     this->TimeCutMaxApparatus2 = nullValue;
+
+    this->ParticleNames = {"rootino", "gamma", "n", "p", "e-", "pi+pi-", "pi0", "eta", "eta'", "charged", "neutral"};
+    for(int i = 0; i < (int)ParticleNames.size(); i++)
+        this->ParticleNameToIndex[ParticleNames[i]] = i;
+
+    this->ParticleNumbers.resize(ParticleNames.size());
+    this->ParticleAMin.resize(ParticleNames.size());
+    this->ParticleAMax.resize(ParticleNames.size());
 }
 
+/* Don't like this constructor */
 ConfigFile::ConfigFile(std::string file)
 {
     this->configFile = file;
@@ -124,7 +133,10 @@ void ConfigFile::loadGoATConfigFile(std::string config_file)
 
     this->SortNParticles = ReadConfig("Sort-NParticles",0,(Char_t*)config_file.c_str());
 
+    ImportConfigAsString(config_file.c_str());
+/*
     flag = ReadConfig("Sort-Particle",0,(Char_t*)config_file.c_str());
+
     flag.erase(0, flag.find_first_of(" \t")); // thats just pi0 string
     flag.erase(0, flag.find_first_of("0123456789"));
     this->pi0Number = flag.substr(0, flag.find_first_of(" \t"));
@@ -134,7 +146,57 @@ void ConfigFile::loadGoATConfigFile(std::string config_file)
     flag.erase(0, flag.find_first_of(" \t"));
     flag.erase(0, flag.find_first_of("0123456789"));
     this->pi0AMax = flag.substr(0, flag.find_first_of(" \t \n"));
+*/
 
+    /*
+     * Looping through Post Reconstruction Particle definitions
+     */
+    int instance = 0;
+    while(ResolvePostParticleSortingString(ReadConfig("Sort-Particle", instance++, (Char_t*)config_file.c_str())));
+}
+
+bool ConfigFile::ResolvePostParticleSortingString(std::string flag)
+{
+
+char            particleName[256];
+char cond[256];
+Int_t           num;
+Double_t        th_min, th_max;
+
+if( sscanf( flag.c_str(), "%s %d %s %lf %lf\n", particleName, &num, cond, &th_min, &th_max) == 5 )
+{
+    if(std::find(ParticleNames.begin(), ParticleNames.end(), std::string(particleName)) != ParticleNames.end()) {
+        ParticleNumbers[ParticleNameToIndex[std::string(particleName)]] = std::to_string(num) + (cond);
+        ParticleAMin[ParticleNameToIndex[std::string(particleName)]] = std::to_string(th_min);
+        ParticleAMax[ParticleNameToIndex[std::string(particleName)]] = std::to_string(th_max);
+        std::cout << "last found definition: " << particleName << std::endl;
+        return true;
+    }
+
+
+}
+
+   return false;
+//    std::string tempParticleName =  flag.substr(0, flag.find_first_of(" \t"));
+//    flag.erase(0, flag.find_first_of(" \t")); // thats just pi0 string
+//    flag.erase(0, flag.find_first_of("0123456789"));
+//    std::string ParticleNumber = flag.substr(0, flag.find_first_of(" \t"));
+
+//std::cout << tempParticleName << std::endl;
+//std::cout << ParticleNameToIndex[tempParticleName] << std::endl;
+//    this->ParticleNumbers[ParticleNameToIndex[tempParticleName]] = ParticleNumber;
+
+//    flag.erase(0, flag.find_first_of(" \t"));
+//    flag.erase(0, flag.find_first_of("0123456789"));
+//    std::string ParticleAngleMin = flag.substr(0, flag.find_first_of(" \t"));
+
+//    this->ParticleAMin[ParticleNameToIndex[tempParticleName]] = ParticleAngleMin;
+
+//    flag.erase(0, flag.find_first_of(" \t"));
+//    flag.erase(0, flag.find_first_of("0123456789"));
+//    std::string ParticleAngleMax = flag.substr(0, flag.find_first_of(" \t \n"));
+
+//    this->ParticleAMax[ParticleNameToIndex[tempParticleName]] = ParticleAngleMax;
 }
 
 void ConfigFile::writeGoATConfigFile(const std::string filename)
@@ -203,6 +265,7 @@ void ConfigFile::writeGoATConfigFile(const std::string filename)
     if(this->SortNParticles != nullValue && std::atoi(this->SortNParticles.c_str()) != 0)
         outputData.append("Sort-NParticles:").append("\t\t").append(this->SortNParticles).append("\n");
 
+    /*
     if(this->pi0Number != nullValue &&
        this->pi0AMin != nullValue &&
        this->pi0AMax != nullValue &&
@@ -211,10 +274,30 @@ void ConfigFile::writeGoATConfigFile(const std::string filename)
                   .append(this->pi0Number).append("\t\t")
                   .append(this->pi0AMin).append("\t\t")
                   .append(this->pi0AMax).append("\n");
+    */
+
+    for(int i = 0; i < (int)ParticleNames.size(); i++)
+    {
+        if (!ParticleNumbers[i].empty() && !ParticleAMin[i].empty() && !ParticleAMax[i].empty())
+        {
+            outputData.append("Sort-Particle:").append("\t")
+                      .append(ParticleNames[i]).append("\t\t")
+                      .append(ParticleNumbers[i]).append("\t")
+                      .append(ParticleAMin[i]).append("\t\t")
+                      .append(ParticleAMax[i]).append("\n");
+        }
+    }
 
     outfile.write (outputData.c_str(),outputData.size());
     outfile.close();
 
+}
+
+void ConfigFile::ImportConfigAsString(std::string filename)
+{
+    std::ifstream ifs(filename);
+    this->configFileContents.assign( (std::istreambuf_iterator<char>(ifs) ),
+                    (std::istreambuf_iterator<char>()    ) );
 }
 
 void ConfigFile::loadGoATConfigFile(const char *config_file)
@@ -229,6 +312,7 @@ void ConfigFile::writeGoATConfigFile(const char *filename)
 
 std::string ConfigFile::ReadConfig(const std::string& key_in, const Int_t instance, const Char_t* configname)
 {
+
     Int_t string_instance = 0;
     std::string key = key_in;
     std::transform(key.begin(), key.end(),key.begin(), ::toupper);
@@ -289,9 +373,9 @@ std::string ConfigFile::ReadConfig(const std::string& key_in, const Int_t instan
     }
 }
 
-std::string ConfigFile::ReadConfig(const std::string& key_in, std::string configname)
+std::string ConfigFile::ReadConfig(const std::string& key_in)
 {
-    return ConfigFile::ReadConfig(key_in, 0, (Char_t*)(configname.c_str()));
+    return ConfigFile::ReadConfig(key_in, 0, (Char_t*)(configFileContents.c_str()));
 }
 
 
@@ -579,4 +663,44 @@ std::string ConfigFile::getSortNParticles()
 std::string ConfigFile::getSortNParticlesSign()
 {
     return this->SortNParticlesSign;
+}
+
+std::vector<std::string> ConfigFile::getVectorParticleNames()
+{
+    return this->ParticleNames;
+}
+
+std::vector<std::string> ConfigFile::getVectorPParticleNumbers()
+{
+    return this->ParticleNumbers;
+}
+
+std::vector<std::string> ConfigFile::getVectorParticleAMin()
+{
+    return this->ParticleAMin;
+}
+
+std::vector<std::string> ConfigFile::getVectorParticleAMax()
+{
+    return this->ParticleAMax;
+}
+
+std::map<std::string, int> ConfigFile::getMapPS()
+{
+    return this->ParticleNameToIndex;
+}
+
+void ConfigFile::setVectorParticleNumbers(std::vector<std::string> v)
+{
+    ParticleNumbers = v;
+}
+
+void ConfigFile::setVectorParticleAMin(std::vector<std::string> v)
+{
+    ParticleAMin = v;
+}
+
+void ConfigFile::setVectorParticleAMax(std::vector<std::string> v)
+{
+    ParticleAMax = v;
 }

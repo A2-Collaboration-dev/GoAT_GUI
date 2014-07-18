@@ -7,6 +7,7 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    DoneConstructing = false;
     if (!configGUI.loadGUIConfigFile(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/settings.gui")))
     {
         std::cout << "GUI Config file not found at: " <<
@@ -70,6 +71,7 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
     /* Temporary */
     ui->tabWidgetOutput->setEnabled(false);
     ui->tabWidgetInput->setTabEnabled(1, false);
+
 
 }
 
@@ -187,6 +189,10 @@ void ConfigurationDialog::on_buttonOutputBrowse_clicked()
 
 void ConfigurationDialog::on_pushButton_clicked()
 {
+    configFile.setVectorParticleNumbers(ParticleNumbers);
+    configFile.setVectorParticleAMin(ParticleAMin);
+    configFile.setVectorParticleAMax(ParticleAMax);
+
     configGUI.writeGUIConfigFile(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/settings.gui"));
     configFile.writeGoATConfigFile(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat"));
     this->close();
@@ -552,8 +558,36 @@ void ConfigurationDialog::updateUIText()
         ui->checkBoxCPS->setChecked(true);
     }
 
+    ParticleNames = configFile.getVectorParticleNames();
+    ParticleNumbers = configFile.getVectorPParticleNumbers();
+    ParticleAMin = configFile.getVectorParticleAMin();
+    ParticleAMax = configFile.getVectorParticleAMax();
+    ParticleNameToIndex = configFile.getMapPS();
+
+
+
+    /* In futute it is possible to remap names */
+    for(int i = 0; i < (int)ParticleNames.size(); i++)
+        ui->ParticleBox->addItem(ParticleNames[i].c_str());
+
+
+
+//    for(int i = 0; i <(int)ParticleNames.size(); i++)
+//    {
+//        if (!ParticleNumbers[i].empty())
+//           std::cout << ParticleNames[i] << " " << ParticleNumbers[i]<< " " << ParticleAMin[i] << " " << ParticleAMax[i] << std::endl;
+//     }
+
+    /* Updates list of particles that are being used */
+    std::string ActiveParticles("");
+    for(int i = 0; i <(int)ParticleNames.size(); i++)
+        if (!ParticleNumbers[i].empty() && !ParticleAMin[i].empty() && !ParticleAMax[i].empty())
+            ActiveParticles.append(ParticleNames[i] + " ");
+    ui->labelPSParticleList->setText(ActiveParticles.c_str());
+
     ui->pushButton->setEnabled(true);
 
+    DoneConstructing = true;
 }
 
 void ConfigurationDialog::on_lineEditConfigMRWidthPi0_editingFinished()
@@ -577,24 +611,37 @@ void ConfigurationDialog::on_lineEditConfigMRWidthEtaprime_editingFinished()
 
 void ConfigurationDialog::on_comboBoxPS1_currentIndexChanged(int index)
 {
-    configFile.setPSpi0Number(resolvingComboBoxIndex(index),
-                              ui->lineEditPSNum1->text().toStdString());
+    // Bug: changing only sign does not store index.
+    //std::cout << index << resolvingComboBoxIndex(index) << std::endl;
+
+    //articleNumbers[index] = ui->lineEditPSNum1->text().toStdString() + resolvingComboBoxIndex(index);
+    //configFile.setPSpi0Number(resolvingComboBoxIndex(index),
+    //                          ui->lineEditPSNum1->text().toStdString());
 }
 
 void ConfigurationDialog::on_lineEditPSNum1_editingFinished()
 {
-    configFile.setPSpi0Number(resolvingComboBoxIndex(ui->comboBoxPS1->currentIndex()),
-                              ui->lineEditPSNum1->text().toStdString());
+//    ParticleNumbers[ui->ParticleBox->currentIndex()] = ui->lineEditPSNum1->text().toStdString() + resolvingComboBoxIndex(ui->comboBoxPS1->currentIndex());
+//    //configFile.setPSpi0Number(resolvingComboBoxIndex(ui->comboBoxPS1->currentIndex()),
+//    //                          ui->lineEditPSNum1->text().toStdString());
+//    std::cout << "done: " << ParticleNumbers[ui->ParticleBox->currentIndex()] << std::endl;
+//    std::cout << "index: " << ui->ParticleBox->currentIndex() << std::endl;
 }
 
 void ConfigurationDialog::on_lineEditPSMin1_editingFinished()
 {
-    configFile.setPSpi0AMin(ui->lineEditPSMin1->text().toStdString());
+//    ParticleAMin[ui->ParticleBox->currentIndex()] = ui->lineEditPSMin1->text().toStdString();
+//   // configFile.setPSpi0AMin(ui->lineEditPSMin1->text().toStdString());
+//    std::cout << "done: " << ParticleAMin[ui->ParticleBox->currentIndex()] << std::endl;
+//    std::cout << "index: " << ui->ParticleBox->currentIndex() << std::endl;
 }
 
 void ConfigurationDialog::on_lineEditPSMax1_editingFinished()
 {
-    configFile.setPSpi0AMax(ui->lineEditPSMax1->text().toStdString());
+//    ParticleAMax[ui->ParticleBox->currentIndex()] = ui->lineEditPSMax1->text().toStdString();
+//    //configFile.setPSpi0AMax(ui->lineEditPSMax1->text().toStdString());
+//    std::cout << "done: " << ParticleAMax[ui->ParticleBox->currentIndex()] << std::endl;
+//    std::cout << "index: " << ui->ParticleBox->currentIndex() << std::endl;
 }
 
 void ConfigurationDialog::on_comboBoxPSSortN_currentIndexChanged(int index)
@@ -607,4 +654,63 @@ void ConfigurationDialog::on_lineEditPSSortN_editingFinished()
 {
     configFile.setSortNParticles(resolvingComboBoxIndex(ui->comboBoxPSSortN->currentIndex()),
                                  ui->lineEditPSSortN->text().toStdString());
+}
+
+void ConfigurationDialog::on_comboBox_2_currentIndexChanged(int index)
+{
+
+}
+
+void ConfigurationDialog::setPostReconstructionFields(int DropIndex, std::string number, std::string AMin, std::string AMax)
+{
+
+}
+
+void ConfigurationDialog::on_ParticleBox_currentIndexChanged(int index)
+{    if (!DoneConstructing) return;
+    if (!ParticleNumbers[index].empty() && !ParticleAMin[index].empty() && !ParticleAMax[index].empty())
+    {
+        ui->comboBoxPS1->setCurrentIndex(InverseResolvingBoxIndex(ParticleNumbers[index].substr(ParticleNumbers[index].length()-1, 1)));
+        ui->lineEditPSNum1->setText(ParticleNumbers[index].substr(0,  ParticleNumbers[index].length() - 1).c_str());
+        ui->lineEditPSMin1->setText(ParticleAMin[index].c_str());
+        ui->lineEditPSMax1->setText(ParticleAMax[index].c_str());
+    } else {
+        ui->lineEditPSNum1->setText("");
+        ui->lineEditPSMin1->setText("");
+        ui->lineEditPSMax1->setText("");
+    }
+}
+
+void ConfigurationDialog::on_lineEditPSNum1_textEdited(const QString &arg1)
+{
+    if (!DoneConstructing) return;
+
+    ParticleNumbers[ui->ParticleBox->currentIndex()] = ui->lineEditPSNum1->text().toStdString() + resolvingComboBoxIndex(ui->comboBoxPS1->currentIndex());
+    UpdateLabel();
+}
+
+void ConfigurationDialog::on_lineEditPSMin1_textEdited(const QString &arg1)
+{
+    if (!DoneConstructing) return;
+
+    ParticleAMin[ui->ParticleBox->currentIndex()] = ui->lineEditPSMin1->text().toStdString();
+    UpdateLabel();
+}
+
+void ConfigurationDialog::on_lineEditPSMax1_textEdited(const QString &arg1)
+{
+    if (!DoneConstructing) return;
+
+    ParticleAMax[ui->ParticleBox->currentIndex()] = ui->lineEditPSMax1->text().toStdString();
+    UpdateLabel();
+}
+
+void ConfigurationDialog::UpdateLabel()
+{
+    /* Updates list of particles that are being used */
+    std::string ActiveParticles("");
+    for(int i = 0; i <(int)ParticleNames.size(); i++)
+        if (!ParticleNumbers[i].empty() && !ParticleAMin[i].empty() && !ParticleAMax[i].empty())
+            ActiveParticles.append(ParticleNames[i] + " ");
+    ui->labelPSParticleList->setText(ActiveParticles.c_str());
 }

@@ -89,6 +89,8 @@ private slots:
 
     void on_lineEditConfigPreSortEnergySum_editingFinished();
 
+    void setPostReconstructionFields(int DropIndex, std::string number, std::string AMin, std::string AMax);
+
 private:
     bool importTreeFromFile(std::string treename, std::string filename);
     bool importTreeFromFile(char* treename, std::string filename);
@@ -134,6 +136,16 @@ private:
         else return 2;
     }
 
+    std::vector<std::string> ParticleNames;
+    std::vector<std::string> ParticleNumbers;
+    std::vector<std::string> ParticleAMin;
+    std::vector<std::string> ParticleAMax;
+    std::map<std::string, int> ParticleNameToIndex;
+
+    bool DoneConstructing;
+
+    void UpdateLabel();
+
 private slots:
     void RootSpinBoxEvent(TObject* object, uint event, TCanvas* canvas);
     void RootCanvasEvent(TObject* object, uint event, TCanvas* canvas);
@@ -149,6 +161,11 @@ private slots:
     void on_lineEditPSMax1_editingFinished();
     void on_comboBoxPSSortN_currentIndexChanged(int index);
     void on_lineEditPSSortN_editingFinished();
+    void on_comboBox_2_currentIndexChanged(int index);
+    void on_ParticleBox_currentIndexChanged(int index);
+    void on_lineEditPSNum1_textEdited(const QString &arg1);
+    void on_lineEditPSMin1_textEdited(const QString &arg1);
+    void on_lineEditPSMax1_textEdited(const QString &arg1);
 };
 
 

@@ -530,228 +530,148 @@
                     </item>
                     <item>
                      <widget class="QWidget" name="widget_12" native="true">
-                      <layout class="QGridLayout" name="gridLayout_3">
-                       <item row="0" column="0">
-                        <widget class="QLabel" name="label_4">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="text">
-                          <string>Particle</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_12">
+                       <item>
+                        <widget class="QWidget" name="widget_18" native="true">
+                         <layout class="QGridLayout" name="gridLayout_3">
+                          <item row="0" column="0">
+                           <widget class="QLabel" name="label_4">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="text">
+                             <string>Particle</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="0" column="2">
+                           <widget class="QLabel" name="label_5">
+                            <property name="text">
+                             <string>Number</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="0" column="3">
+                           <widget class="QLabel" name="label_6">
+                            <property name="text">
+                             <string>θ min</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="0" column="4">
+                           <widget class="QLabel" name="label_7">
+                            <property name="text">
+                             <string>θ-max</string>
+                            </property>
+                            <property name="alignment">
+                             <set>Qt::AlignCenter</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="0">
+                           <widget class="QComboBox" name="ParticleBox">
+                            <property name="currentIndex">
+                             <number>-1</number>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="1">
+                           <widget class="QComboBox" name="comboBoxPS1">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <item>
+                             <property name="text">
+                              <string>≥</string>
+                             </property>
+                            </item>
+                            <item>
+                             <property name="text">
+                              <string>≤</string>
+                             </property>
+                            </item>
+                            <item>
+                             <property name="text">
+                              <string>=</string>
+                             </property>
+                            </item>
+                           </widget>
+                          </item>
+                          <item row="1" column="2">
+                           <widget class="QLineEdit" name="lineEditPSNum1">
+                            <property name="inputMethodHints">
+                             <set>Qt::ImhDigitsOnly</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="3">
+                           <widget class="QLineEdit" name="lineEditPSMin1">
+                            <property name="inputMethodHints">
+                             <set>Qt::ImhDigitsOnly</set>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="4">
+                           <widget class="QLineEdit" name="lineEditPSMax1">
+                            <property name="inputMethodHints">
+                             <set>Qt::ImhDigitsOnly</set>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
                         </widget>
                        </item>
-                       <item row="0" column="4">
-                        <widget class="QLabel" name="label_6">
-                         <property name="text">
-                          <string>θ min</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="5">
-                        <widget class="QLabel" name="label_7">
-                         <property name="text">
-                          <string>θ-max</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="0">
-                        <widget class="QCheckBox" name="checkBoxpi0">
-                         <property name="text">
-                          <string>π0</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="2">
-                        <widget class="QComboBox" name="comboBoxPS1">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <item>
-                          <property name="text">
-                           <string>≥</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>≤</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>=</string>
-                          </property>
-                         </item>
-                        </widget>
-                       </item>
-                       <item row="1" column="3">
-                        <widget class="QLineEdit" name="lineEditPSNum1">
-                         <property name="inputMethodHints">
-                          <set>Qt::ImhDigitsOnly</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="4">
-                        <widget class="QLineEdit" name="lineEditPSMin1">
-                         <property name="inputMethodHints">
-                          <set>Qt::ImhDigitsOnly</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="5">
-                        <widget class="QLineEdit" name="lineEditPSMax1">
-                         <property name="inputMethodHints">
-                          <set>Qt::ImhDigitsOnly</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="2" column="0" colspan="2">
-                        <widget class="QCheckBox" name="checkBox">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <property name="text">
-                          <string>Charged</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="2" column="2">
-                        <widget class="QComboBox" name="comboBoxPS2">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <item>
-                          <property name="text">
-                           <string>≥</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>≤</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>=</string>
-                          </property>
-                         </item>
-                        </widget>
-                       </item>
-                       <item row="2" column="3">
-                        <widget class="QLineEdit" name="lineEditPSNum2">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <property name="inputMethodHints">
-                          <set>Qt::ImhDigitsOnly</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="2" column="4">
-                        <widget class="QLineEdit" name="lineEditPSMin2">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <property name="inputMethodHints">
-                          <set>Qt::ImhDigitsOnly</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="2" column="5">
-                        <widget class="QLineEdit" name="lineEditPSMax2">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <property name="inputMethodHints">
-                          <set>Qt::ImhDigitsOnly</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="3" column="0" colspan="2">
-                        <widget class="QCheckBox" name="checkBox_2">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <property name="text">
-                          <string>Other</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="3" column="2">
-                        <widget class="QComboBox" name="comboBoxPS3">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <item>
-                          <property name="text">
-                           <string>≥</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>≤</string>
-                          </property>
-                         </item>
-                         <item>
-                          <property name="text">
-                           <string>=</string>
-                          </property>
-                         </item>
-                        </widget>
-                       </item>
-                       <item row="3" column="3">
-                        <widget class="QLineEdit" name="lineEditPSNum3">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <property name="inputMethodHints">
-                          <set>Qt::ImhDigitsOnly</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="3" column="4">
-                        <widget class="QLineEdit" name="lineEditPSMin3">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <property name="inputMethodHints">
-                          <set>Qt::ImhDigitsOnly</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="3" column="5">
-                        <widget class="QLineEdit" name="lineEditPSMax3">
-                         <property name="enabled">
-                          <bool>false</bool>
-                         </property>
-                         <property name="inputMethodHints">
-                          <set>Qt::ImhDigitsOnly</set>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="0" column="3">
-                        <widget class="QLabel" name="label_5">
-                         <property name="text">
-                          <string>Number</string>
-                         </property>
-                         <property name="alignment">
-                          <set>Qt::AlignCenter</set>
-                         </property>
+                       <item>
+                        <widget class="QWidget" name="widget_19" native="true">
+                         <layout class="QVBoxLayout" name="verticalLayout_13">
+                          <item>
+                           <widget class="QLabel" name="PSParticle">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="text">
+                             <string>In use:</string>
+                            </property>
+                            <property name="wordWrap">
+                             <bool>true</bool>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QLabel" name="labelPSParticleList">
+                            <property name="font">
+                             <font>
+                              <weight>75</weight>
+                              <bold>true</bold>
+                             </font>
+                            </property>
+                            <property name="text">
+                             <string>TextLabel</string>
+                            </property>
+                            <property name="wordWrap">
+                             <bool>true</bool>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
                         </widget>
                        </item>
                       </layout>

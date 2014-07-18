@@ -7,7 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <TROOT.h>
-
+#include <map>
 
 
 class ConfigFile
@@ -15,6 +15,7 @@ class ConfigFile
 
 private:
     std::string configFile;
+    std::string configFileContents;
 
     std::string ParticleReconstruction;
     std::string ChargedParticleReconstruction;
@@ -27,6 +28,11 @@ private:
     std::string Cut_dE_E_TAPS_Pion;
     std::string Cut_dE_E_TAPS_Electron;
 
+    std::vector<std::string> ParticleNames;
+    std::vector<std::string> ParticleNumbers;
+    std::vector<std::string> ParticleAMin;
+    std::vector<std::string> ParticleAMax;
+    std::map<std::string, int> ParticleNameToIndex;
 
     /* Meson reconstruction */
     std::string Cut_IM_Width_Pi0;
@@ -46,10 +52,16 @@ private:
     std::string SortNParticles;
     std::string SortNParticlesSign;
 
+    /* pi0 */
     std::string pi0Sign;
     std::string pi0Number;
     std::string pi0AMin;
     std::string pi0AMax;
+
+    /* rootino */
+    std::string rootinoNumber;
+    std::string rootinoAMin;
+    std::string rootinoAMax;
 
 
     /* Cuts */
@@ -69,7 +81,11 @@ public:
     ConfigFile(std::string file);
 
     static std::string ReadConfig(const std::string& key_in, const Int_t instance, const Char_t* configname);
-    static std::string ReadConfig(const std::string& key_in, std::string configname);
+
+    std::string ReadConfig(const std::string& key_in);
+    void ImportConfigAsString(std::string filename);
+
+    bool ResolvePostParticleSortingString(std::string flag);
 
     void setParticleReconstruction(int val);
     void setChargedParticleReconstruction(int val);
@@ -146,6 +162,16 @@ public:
     std::string getPSpi0Number();
     std::string getPSpi0AMin();
     std::string getPSpi0AMax();
+
+    std::vector<std::string> getVectorParticleNames();
+    std::vector<std::string> getVectorPParticleNumbers();
+    std::vector<std::string> getVectorParticleAMin();
+    std::vector<std::string> getVectorParticleAMax();
+    std::map<std::string, int> getMapPS();
+
+    void setVectorParticleNumbers(std::vector<std::string> v);
+    void setVectorParticleAMin(std::vector<std::string> v);
+    void setVectorParticleAMax(std::vector<std::string> v);
 
     void loadGoATConfigFile(const char* config_file);
     void loadGoATConfigFile(const std::string config_file);
