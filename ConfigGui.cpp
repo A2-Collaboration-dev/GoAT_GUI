@@ -40,7 +40,6 @@ ConfigGUI::ConfigGUI(std::string filepath)
 
 void ConfigGUI::PrintAll()
 {
-    std::cout << this->GoAT_Config << std::endl;
     std::cout << this->GoAT_Exe << std::endl;
     std::cout << this->Phys_Exe << std::endl;
     std::cout << this->ACQU_Dir << std::endl;
@@ -271,4 +270,14 @@ std::string ConfigGUI::getCompleteACQUFile()
 std::string ConfigGUI::getCompletePhysicsFile()
 {
     return this->CompletePhysicsFile;
+}
+
+void ConfigGUI::setCompleteACQUFile(std::string s)
+{
+    this->CompleteACQUFile = s;
+}
+
+void ConfigGUI::setCompletePhysicsFile(std::string s)
+{
+    this->CompletePhysicsFile = s;
 }

@@ -19,6 +19,7 @@
 
 #include "ConfigGui.h"
 #include "Functions.h"
+#include "QPushButton"
 
 namespace Ui {
 class TabComplete;
@@ -35,6 +36,8 @@ public:
     void updateRootPhysicsFile(const char *file);
     void ReloadRootFile();
     void ReloadRootPhysicsFile();
+
+    QPushButton* getButtonSave();
 
 public slots:
         void UpdateAllGraphics();

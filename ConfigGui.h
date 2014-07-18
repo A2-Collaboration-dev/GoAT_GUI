@@ -47,6 +47,9 @@ public:
     void setLastACQUFile(std::string file);
     void setLastPhysFile(std::string file);
 
+    void setCompleteACQUFile(std::string);
+    void setCompletePhysicsFile(std::string);
+
     void setConfigFilePath(std::string);
 
     void PrintAll();

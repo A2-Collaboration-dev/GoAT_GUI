@@ -16,6 +16,7 @@
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <map>
 
 #include "ConfigGui.h"
 #include "Functions.h"
@@ -33,6 +34,7 @@ public:
     ~TabRunByRun();
     void updateRootFile(const char *file);
     void updateRootPhysicsFile(const char *file);
+    float VerticalSizeExt[5];
 
 private slots:
     void on_pushButtonZoomIn_clicked();
@@ -76,9 +78,12 @@ private:
     int verticalSize;
     TFile*  file;
     TFile* PhysicsFile;
+    std::map <TQtWidget*, QWidget*> ContainerMap;
 
     TH2F * h2;
     void FillWidget(TQtWidget *Twidget, TFile* tfile, std::string detector, std::string filename);
+
+    void UpdateTWidgetSize0();
 };
 
 #endif // TABRUNBYRUN_H

@@ -3,5 +3,8 @@
         <file>data/arrow_down.png</file>
         <file>data/forward.png</file>
         <file>data/view_refresh.png</file>
+        <file>data/disc_drive.png</file>
+        <file>data/cd_drive.png</file>
+        <file>data/cd_rom.png</file>
     </qresource>
 </RCC>

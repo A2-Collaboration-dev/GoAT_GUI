@@ -25,7 +25,7 @@ QPushButton* QueueEditDialog::getButtonSave()
 
 void QueueEditDialog::UpdateTextWidget(std::vector<std::string> vect)
 {
-    ui->textEdit->clear();
+    ui->textEdit->setText("");
 
     foreach(std::string s, vect)
     {
@@ -40,8 +40,10 @@ void QueueEditDialog::on_ButtonCancel_clicked()
 
 void QueueEditDialog::on_ButtonSave_clicked()
 {
+
     QString plainTextEditContents = ui->textEdit->toPlainText();
     QStringList lines = plainTextEditContents.split("\n");
+    this->NewQueueList.clear();
 
     foreach(QString s, lines)
     {

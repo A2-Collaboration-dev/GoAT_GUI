@@ -268,3 +268,8 @@ void TabComplete::on_pushButton_clicked()
     ui->scrollArea->setWidgetResizable(true);
     FillWidget(ui->widget, file, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
 }
+
+QPushButton* TabComplete::getButtonSave()
+{
+    return ui->buttonSave;
+}

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>568</width>
-    <height>449</height>
+    <width>626</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,8 +44,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>424</width>
-                <height>327</height>
+                <width>20</width>
+                <height>28</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -154,8 +154,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>424</width>
-                <height>327</height>
+                <width>20</width>
+                <height>28</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -264,8 +264,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>424</width>
-                <height>327</height>
+                <width>20</width>
+                <height>28</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -374,8 +374,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>424</width>
-                <height>327</height>
+                <width>482</width>
+                <height>331</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -488,8 +488,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>446</width>
-            <height>378</height>
+            <width>504</width>
+            <height>382</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_15">
@@ -576,7 +576,31 @@
            <widget class="QWidget" name="widget_21" native="true"/>
           </item>
           <item>
-           <widget class="QWidget" name="widget_22" native="true"/>
+           <widget class="QWidget" name="widget_22" native="true">
+            <widget class="QPushButton" name="buttonSave">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>80</y>
+               <width>41</width>
+               <height>41</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="Resources.qrc">
+               <normaloff>:/data/cd_rom.png</normaloff>:/data/cd_rom.png</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>35</width>
+               <height>35</height>
+              </size>
+             </property>
+            </widget>
+           </widget>
           </item>
          </layout>
         </widget>

@@ -48,6 +48,8 @@ FORMS    += \
 include("$(ROOTSYS)/include/rootcint.pri")
 
 QMAKE_CXXFLAGS += -std=c++0x
+CONFIG += c++11
+QMAKE_CXXFLAGS += -std=c++11
 
 RESOURCES += \
     Resources.qrc \
@@ -57,4 +59,4 @@ QMAKE_CXXFLAGS += -Wno-write-strings
 QMAKE_CXXFLAGS += -Wno-unused-parameter
 QMAKE_CXXFLAGS += -Wno-unused-function
 
-ICON =
+

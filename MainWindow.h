@@ -98,7 +98,6 @@ private:
 private slots:
 
   void ACQUdirChanged(QString path);
-    void ACQUdirChanged2(QString path);
   void ListQueue();
   void newGoatFile();
   void newPhysicsFile();
@@ -113,9 +112,10 @@ private slots:
   void EditQueueDialog();
   void QueueDialogConfirm();
   void StartQueue();
+  void CompleteButtonSave();
 
   std::string getNewestFile(std::string iDirIn, char* extension);
-  void ExcludeFiles(std::string iDirIn, char* extension);
+  void ExcludeFiles(std::string iDirIn, char* extension, bool includeNewest);
 };
 
 #endif // MAINWINDOW_H
