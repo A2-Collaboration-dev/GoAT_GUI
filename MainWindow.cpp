@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
      * Constructing control tab widget
      */
     ui->tabWidget->addTab(tabRunByRun, QString("Run By Run"));
-    ui->tabWidget->addTab(tabComplete, QString("Complete"));
+    ui->tabWidget->addTab(tabComplete, QString("Accumulated"));
     ui->tabWidget->addTab(tabLog, QString("Events Log"));
 
     /*
@@ -68,6 +68,21 @@ MainWindow::MainWindow(QWidget *parent) :
     configGUI.setConfigFilePath(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/settings.gui"));
     configGUI.PrintAll();
     std::cout << "Application path:" << QCoreApplication::applicationDirPath().toStdString() << std::endl;
+
+    QFileInfo GoAT(configGUI.getGoATExe().c_str());
+    if (!GoAT.exists())
+    {
+        std::cout << "GoAT executable does not exists at:" << configGUI.getGoATExe() << std::endl;
+        tabLog->AppendTextNL(TabLog::ColorB("Hey Patrik, oh by the way GoAT executable was not found.", "Crimson"));
+    }
+
+    QFileInfo PhysicsExe(configGUI.getPhysExe().c_str());
+    if (!PhysicsExe.exists())
+    {
+        std::cout << "Physics executable does not exists at:" << configGUI.getPhysExe() << std::endl;
+        tabLog->AppendTextNL(TabLog::ColorB("Hey Patrik, oh by the way Physics executable was not found.", "Crimson"));
+
+    }
 
     /*
      * Setting labels
@@ -116,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent) :
      * Complete Window Save button
      */
     connect(tabComplete->getButtonSave(), SIGNAL(clicked()), this, SLOT(CompleteButtonSave()));
+    connect(tabComplete->getButtonSave2(), SIGNAL(clicked()), this, SLOT(CompleteButtonSave()));
 
     /*
      * Connecting QueueEditDialog
@@ -125,20 +141,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->tabLog->AppendTextNL("GUI Initialized.");
 
-    //future = QtConcurrent::run(this,&MainWindow::StreamMonitor);
-    //t = new std::thread(&MainWindow::StreamMonitor, this);
-
-    //UpdateCompleteACQU();
-
-    //main function copying 4 files as subdirectories of a new file
-    //TFile *f = new TFile("/home/august/a2GoAT/Arresult.root","recreate");
-    //CopyFile("/home/august/a2GoAT/Acqu_B.root");
-
-    //f->ls();
-    //delete f;
-
-    std::cout << configGUI.getCompleteACQUFile() << std::endl;
-    std::cout << configGUI.getCompletePhysicsFile() << std::endl;
+    std::cout << "Accumulated ACQU: " << configGUI.getCompleteACQUFile() << std::endl;
+    std::cout << "Accumulated Physics: " << configGUI.getCompletePhysicsFile() << std::endl;
 
     /*
      * Excluding all current files in ACQU directory (including the newest (optional))
@@ -195,7 +199,7 @@ void MainWindow::ACQUdirChanged(QString path)
 }
 
 
-void MainWindow::RunGoat()
+void MainWindow::RunGoat(bool Accumulate)
 {
     if (this->GoATProcess->state() != QProcess::NotRunning)
         return;
@@ -214,7 +218,6 @@ void MainWindow::RunGoat()
 
     int MaxContinueAttempts = 5;
 
-    //check if file exists
 
     // are we attempting to check file?
     if (this->OpeningAtempt >= MaxContinueAttempts)
@@ -238,14 +241,27 @@ void MainWindow::RunGoat()
                    << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str();
 
     /*
+     * Arguments for GoAT analysis
+     */
+    std::cout << "GoAT call Arguments: " << std::endl
+              << "-f" << " " << this->curFile.c_str() << " "
+              << "-D" << " " << configGUI.getGoATDir().c_str() << " "
+              << "-p" << " " << configGUI.getACQUPrefix().c_str() << " "
+              << "-P" << " " << configGUI.getGoATPrefix().c_str() << " "
+              << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str() << std::endl;
+
+
+    /*
      * Checking if file is in use
      */
 
     QFileInfo qfile(this->curFile.c_str());
     //this->FinishedACQUFiles.push_back(this->curFile); // Experimental
 
-    /* Check if files was
-     *  modified in 5 seconds, else use it */
+    /*
+     * Check if files was
+     *  modified in x seconds, else use it
+     */
     if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-2))
     {
         tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
@@ -273,9 +289,12 @@ void MainWindow::RunGoat()
     //if(!(std::find(FinishedACQUFiles.begin(), FinishedACQUFiles.end(), this->curFile) != FinishedACQUFiles.end()))
     {
         TakeANap(100);
-        UpdateCompleteACQU(this->curFile.c_str());
-        tabComplete->ReloadRootFile();
-        tabComplete->UpdateGraphicsDetectors();
+        if(Accumulate)
+        {
+            UpdateCompleteACQU(this->curFile.c_str());
+            tabComplete->ReloadRootFile();
+            tabComplete->UpdateGraphicsDetectors();
+        }
     }
 
     TakeANap(5000);
@@ -319,7 +338,7 @@ void MainWindow::ForceRunGoAT()
     }
 
     this->curFile = tabLog->getLabelACQU();
-    this->RunGoat();
+    this->RunGoat(false);
 }
 
 void MainWindow::ForceRunPhysics()
@@ -371,7 +390,7 @@ void MainWindow::newGoatFile()
 
     if (GoATFile.exists())
     {
-        tabLog->AppendTextNL("New " + TabLog::ColorB("GoAT", "BlueViolet") + " file: " + TabLog::Color(GoATFilePath.toStdString(), "DarkOliveGreen"));
+        //tabLog->AppendTextNL("New " + TabLog::ColorB("GoAT", "BlueViolet") + " file: " + TabLog::Color(GoATFilePath.toStdString(), "DarkOliveGreen"));
         tabLog->setLabelLastGoAT(GoATFilePath.toStdString());
         configGUI.setLastGoATFile(GoATFilePath.toStdString());
 
@@ -383,7 +402,20 @@ void MainWindow::newGoatFile()
 
         //TakeANap(1000);
 
+        /*
+         * Arguments for Physics analysis
+         */
+        std::cout << "Physics Arguments: " << std::endl
+                  << "-f" << " " << GoATFilePath.toStdString().c_str() << " "
+                  << "-D" << " " << configGUI.getPhysicsDir().c_str() << " "
+                  << "-p" << " " << configGUI.getGoATPrefix().c_str() << " "
+                  << "-P" << " " << configGUI.getPhysPrefix().c_str() << " "
+                  << (QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat")).c_str() << std::endl;
+
+
+
         tabLog->AppendTextNL("Starting " + TabLog::ColorB("Physics Analysis", "RoyalBlue ") + " with: " + TabLog::Color(GoATFilePath.toStdString(), "DarkOliveGreen"));
+        std::cout << "Starting Physics analysis" << std::endl;
 
         if (this->PhysicsProcess->state() == QProcess::NotRunning)
              PhysicsProcess->start(configGUI.getPhysExe().c_str(), *PhysicsArguments);
@@ -630,7 +662,7 @@ void MainWindow::CompleteExperimentDataCreate(const char *inputFile, const char 
 
 void MainWindow::UpdateCompleteACQU(const char* inputFile)
 {
-    tabLog->AppendTextNL(TabLog::ColorB("Complete ", "DarkOrange") + TabLog::ColorB("ACQU", "CadetBlue") + "  histograms are being updated: " + TabLog::Color(inputFile, "DarkOliveGreen"));
+    tabLog->AppendTextNL(TabLog::ColorB("Accumulated ", "DarkOrange") + TabLog::ColorB("ACQU", "CadetBlue") + "  histograms are being updated: " + TabLog::Color(inputFile, "DarkOliveGreen"));
 
     TakeANap(100);
 
@@ -647,16 +679,16 @@ void MainWindow::UpdateCompleteACQU(const char* inputFile)
 
 void MainWindow::UpdateCompletePhysics(const char* inputFile)
 {
-    tabLog->AppendTextNL(TabLog::ColorB("Complete ", "DarkOrange") + TabLog::ColorB("Physics", "RoyalBlue") + "  histograms are being updated: " + TabLog::Color(inputFile, "DarkOliveGreen"));
+    tabLog->AppendTextNL(TabLog::ColorB("Accumulated ", "DarkOrange") + TabLog::ColorB("Physics", "RoyalBlue") + "  histograms are being updated: " + TabLog::Color(inputFile, "DarkOliveGreen"));
     TakeANap(100);
 
     QFile CompleteDataFile(configGUI.getCompletePhysicsFile().c_str());
     if (!CompleteDataFile.exists())
     {
-        std::cout << "Creating Complete physics data file." << std::endl;
+        std::cout << "Creating Accumulated physics data file." << std::endl;
         CompleteExperimentDataCreate(inputFile, configGUI.getCompletePhysicsFile().c_str());
     } else {
-        std::cout << "Updating Complete physics data file." << std::endl;
+        std::cout << "Updating Accumulated physics data file." << std::endl;
         CompleteExperimentDataUpdate(inputFile, configGUI.getCompletePhysicsFile().c_str());
     }
 }
@@ -762,14 +794,17 @@ void MainWindow::CompleteButtonSave()
     std::string AccumulatedAcquDirectory = AccumulatedAcquFile.absoluteDir().absolutePath().toStdString();
 
     std::string newAccumulatedAcquPath = AccumulatedAcquDirectory  + std::string("/") + MasterPrefix + datePrefix + std::string(".root");
-    QFile::copy(AccumulatedAcquFile.absoluteFilePath(), newAccumulatedAcquPath.c_str());
+    if (QFile::copy(AccumulatedAcquFile.absoluteFilePath(), newAccumulatedAcquPath.c_str()))
+        tabLog->AppendTextNL(TabLog::ColorB("Accumulated ", "DarkOrange") + TabLog::ColorB("ACQU", "CadetBlue") + "  resaved as : " + TabLog::Color(newAccumulatedAcquPath, "DarkOliveGreen"));
+
 
     /* Copying Accumulated ACQU */
     QFileInfo AccumulatedPhysicsFile(configGUI.getCompletePhysicsFile().c_str());
     std::string AccumulatedPhysicsDirectory = AccumulatedPhysicsFile.absoluteDir().absolutePath().toStdString();
 
     std::string newAccumulatedPhysicsPath = AccumulatedPhysicsDirectory  + std::string("/") + MasterPhysicsPrefix + datePrefix + std::string(".root");
-    QFile::copy(AccumulatedPhysicsFile.absoluteFilePath(), newAccumulatedPhysicsPath.c_str());
+    if (QFile::copy(AccumulatedPhysicsFile.absoluteFilePath(), newAccumulatedPhysicsPath.c_str()))
+        tabLog->AppendTextNL(TabLog::ColorB("Accumulated ", "DarkOrange") + TabLog::ColorB("Physics", "RoyalBlue") + "  resaved as : " + TabLog::Color(newAccumulatedPhysicsPath, "DarkOliveGreen"));
 
     QFile::remove(configGUI.getCompletePhysicsFile().c_str());
     QFile::remove(configGUI.getCompleteACQUFile().c_str());

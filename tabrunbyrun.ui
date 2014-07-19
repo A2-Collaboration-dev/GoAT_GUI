@@ -26,12 +26,15 @@
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QTabWidget" name="tabWidget_2">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="currentIndex">
           <number>0</number>
          </property>
          <widget class="QWidget" name="tab_3">
           <attribute name="title">
-           <string>CB</string>
+           <string>Check CB</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
@@ -141,7 +144,7 @@
          </widget>
          <widget class="QWidget" name="tab_4">
           <attribute name="title">
-           <string>Taps 1</string>
+           <string>Check TAPS</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
@@ -251,7 +254,7 @@
          </widget>
          <widget class="QWidget" name="tab_5">
           <attribute name="title">
-           <string>Taps 2</string>
+           <string>Check Hit Patterns</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>

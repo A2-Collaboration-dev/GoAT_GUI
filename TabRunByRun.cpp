@@ -1,6 +1,16 @@
 #include "TabRunByRun.h"
 #include "ui_tabrunbyrun.h"
 
+void TabRunByRun::TakeANap(int ms)
+{
+    QTime dieTime = QTime::currentTime().addMSecs( ms );
+    while( QTime::currentTime() < dieTime )
+    {
+        waitCondition.wait(&mutex, 100);
+        QCoreApplication::processEvents( QEventLoop::AllEvents, 100 );
+    }
+}
+
 TabRunByRun::TabRunByRun(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TabRunByRun)
@@ -53,15 +63,16 @@ TabRunByRun::TabRunByRun(QWidget *parent) :
     //FillWidget(ui->widgetPA, PhysicsFile, std::string("PA"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     //updateAllGraphics();
 
+    VerticalSizeExt = {1, 1, 1, 1, 1};
+
     this->UpdateGraphicsDetectors();
     this->UpdateGraphicsPhysics();
 
+    //ui->tabWidget_2->setTabEnabled(3, false);
+    ui->tabWidget_2->removeTab(3);
     //ContainerMap.insert(std::make_pair(ui->scrollAreaWidgetContents, ui->widget));
     //ContainerMap.insert(std::make_pair(ui->widgetTaps1, ui->scrollAreaWidgetContents_2));
     //std::cout << "Map size: " << (int) ContainerMap.size() << std::endl;
-
-    for(int i = 0; i< 5; i++)
-        VerticalSizeExt[i] = 1;
 }
 
 TabRunByRun::~TabRunByRun()
@@ -131,27 +142,24 @@ void TabRunByRun::on_pushButtonZoomIn_clicked()
 {
     ui->scrollArea->setWidgetResizable(false);
     ui->widget->resize(ui->widget->size() + QSize(150, 0));
-    ui->scrollAreaWidgetContents->resize(ui->widget->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents->resize(ui->scrollAreaWidgetContents->size() + QSize(150, 0));
 }
 
 void TabRunByRun::on_pushButtonZoomOut_clicked()
 {
     ui->scrollArea->setWidgetResizable(false);
     ui->widget->resize(ui->widget->size() + QSize(0, 150));
-    ui->scrollAreaWidgetContents->resize(ui->widget->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents->resize(ui->scrollAreaWidgetContents->size() + QSize(0, 150));
 }
 
 void TabRunByRun::on_pushButton_clicked()
 {
-        std::cout << VerticalSizeExt[0] << std::endl;
-    UpdateTWidgetSize0();
-    //ui->widget->GetCanvas()->Clear();
-    std::cout << VerticalSizeExt[0] << std::endl;
-      //ui->scrollArea->setWidgetResizable(false);
-      //ui->scrollAreaWidgetContents->resize(QSize(ui->scrollAreaWidgetContents->size().width(), ui->scrollAreaWidgetContents->size().height() * 1.3333));
-      //ui->widget->resize(QSize(ui->widget->size().width(), ui->widget->size().height() * 1.3333));
-    //ui->scrollArea->setWidgetResizable(true);
-    //FillWidget(ui->widget, file, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    ui->scrollArea->setWidgetResizable(true);
+    FillWidget(ui->widget, file, std::string("CB"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    ui->scrollArea->setWidgetResizable(false);
+    ui->widget->resize(QSize(ui->widget->size().width(), ui->widget->size().height() * VerticalSizeExt[0]));
+    ui->scrollAreaWidgetContents->resize(QSize(ui->scrollAreaWidgetContents->size().width(), ui->scrollAreaWidgetContents->size().height() * VerticalSizeExt[0]));
+    ui->widget->update();
 }
 
 void TabRunByRun::FillWidget(TQtWidget *Twidget,TFile* tfile, std::string detector, std::string filename)
@@ -179,14 +187,6 @@ void TabRunByRun::FillWidget(TQtWidget *Twidget,TFile* tfile, std::string detect
         return;
     }
 
-
-  // std::for_each(ContainerMap.begin(), ContainerMap.end(), [](){
-  //     std::cout << "hey" << std::endl;
-  //  });
-
-    //std::for_each(ContainerMap.begin(), ContainerMap.end(),
-    //              [](auto i){ });
-
     std::string ConfigFileContent( (std::istreambuf_iterator<char>(ifs) ),
                          (std::istreambuf_iterator<char>()    ) );
 
@@ -200,19 +200,19 @@ void TabRunByRun::FillWidget(TQtWidget *Twidget,TFile* tfile, std::string detect
 
     getNamesList(detector, histList, ConfigFileContent);
 
-
-
     horizontalSize = histList.size() < 3 ? histList.size() : 3;
     verticalSize = histList.size() % 3 == 0 ? histList.size() / 3 : histList.size() / 3 + 1;
 
     if (ui->widget == Twidget)
-     {
-         this->VerticalSizeExt[0] = static_cast<float>(verticalSize)/3;
-         std::cout << "reached " << verticalSize << " " << VerticalSizeExt[0] << std::endl;
-     }
-
-    std::cout << horizontalSize << " " << verticalSize << std::endl;
-
+         this->VerticalSizeExt[0] = static_cast<float>(verticalSize)/3 > 1 ? static_cast<float>(verticalSize)/3 : 1;
+    if (Twidget == ui->widgetTaps1)
+         this->VerticalSizeExt[1] = static_cast<float>(verticalSize)/3 > 1 ? static_cast<float>(verticalSize)/3 : 1;
+    if (Twidget == ui->widgetTaps2)
+         this->VerticalSizeExt[2] = static_cast<float>(verticalSize)/3 > 1 ? static_cast<float>(verticalSize)/3 : 1;
+    if (Twidget == ui->widgetTaps3)
+         this->VerticalSizeExt[3] = static_cast<float>(verticalSize)/3 > 1 ? static_cast<float>(verticalSize)/3 : 1;
+    if (Twidget == ui->widgetPA)
+         this->VerticalSizeExt[4] = static_cast<float>(verticalSize)/3 > 1 ? static_cast<float>(verticalSize)/3 : 1;
 
     Twidget->GetCanvas()->Divide(horizontalSize, verticalSize);
     for(int i = 0; i < static_cast<int>(histList.size()); i++)
@@ -227,9 +227,6 @@ void TabRunByRun::FillWidget(TQtWidget *Twidget,TFile* tfile, std::string detect
 
     Twidget->Refresh();
     Twidget->update();
-
-    std::cout << "fuckign number: "<< VerticalSizeExt[0] << std::endl;
-
 }
 
 void TabRunByRun::on_buttonTaps1R_clicked()
@@ -238,6 +235,8 @@ void TabRunByRun::on_buttonTaps1R_clicked()
     ui->scrollArea_2->setWidgetResizable(true);
     FillWidget(ui->widgetTaps1,file, std::string("TAPS1"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     ui->scrollArea_2->setWidgetResizable(false);
+    ui->widgetTaps1->resize(QSize(ui->widgetTaps1->size().width(), ui->widgetTaps1->size().height() * VerticalSizeExt[1]));
+    ui->scrollAreaWidgetContents_2->resize(QSize(ui->scrollAreaWidgetContents_2->size().width(), ui->scrollAreaWidgetContents_2->size().height() * VerticalSizeExt[1]));
 }
 
 void TabRunByRun::on_buttonTaps2R_clicked()
@@ -246,6 +245,9 @@ void TabRunByRun::on_buttonTaps2R_clicked()
     ui->scrollArea_3->setWidgetResizable(true);
     FillWidget(ui->widgetTaps2, file, std::string("TAPS2"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     ui->scrollArea_3->setWidgetResizable(false);
+    ui->widgetTaps2->resize(QSize(ui->widgetTaps2->size().width(), ui->widgetTaps2->size().height() * VerticalSizeExt[2]));
+    ui->scrollAreaWidgetContents_3->resize(QSize(ui->scrollAreaWidgetContents_3->size().width(), ui->scrollAreaWidgetContents_3->size().height() * VerticalSizeExt[2]));
+
 }
 
 void TabRunByRun::on_buttonTaps3R_clicked()
@@ -254,76 +256,74 @@ void TabRunByRun::on_buttonTaps3R_clicked()
     ui->scrollArea_4->setWidgetResizable(true);
     FillWidget(ui->widgetTaps3, file, std::string("TAPS3"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
     ui->scrollArea_4->setWidgetResizable(false);
+    ui->widgetTaps3->resize(QSize(ui->widgetTaps3->size().width(), ui->widgetTaps3->size().height() * VerticalSizeExt[3]));
+    ui->scrollAreaWidgetContents_4->resize(QSize(ui->scrollAreaWidgetContents_4->size().width(), ui->scrollAreaWidgetContents_4->size().height() * VerticalSizeExt[3]));
+
 }
 
 void TabRunByRun::on_buttonTaps1Plus_clicked()
 {
     ui->scrollArea_2->setWidgetResizable(false);
     ui->widgetTaps1->resize(ui->widgetTaps1->size() + QSize(150, 0));
-    ui->scrollAreaWidgetContents_2->resize(ui->widgetTaps1->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_2->resize(ui->scrollAreaWidgetContents_2->size() + QSize(150, 0));
 }
 
 void TabRunByRun::on_buttonTaps2Plus_clicked()
 {
     ui->scrollArea_3->setWidgetResizable(false);
     ui->widgetTaps2->resize(ui->widgetTaps2->size() + QSize(150, 0));
-    ui->scrollAreaWidgetContents_3->resize(ui->widgetTaps2->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_3->resize(ui->scrollAreaWidgetContents_3->size() + QSize(150, 0));
 }
 
 void TabRunByRun::on_buttonTaps3Plus_clicked()
 {
     ui->scrollArea_4->setWidgetResizable(false);
     ui->widgetTaps3->resize(ui->widgetTaps3->size() + QSize(150, 0));
-    ui->scrollAreaWidgetContents_4->resize(ui->widgetTaps3->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_4->resize(ui->scrollAreaWidgetContents_4->size() + QSize(150, 0));
 }
 
 void TabRunByRun::on_buttonTaps1Minus_clicked()
 {
     ui->scrollArea_2->setWidgetResizable(false);
     ui->widgetTaps1->resize(ui->widgetTaps1->size() + QSize(0, 150));
-    ui->scrollAreaWidgetContents_2->resize(ui->widgetTaps1->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_2->resize(ui->scrollAreaWidgetContents_2->size() + QSize(0, 150));
 }
 
 void TabRunByRun::on_buttonTaps2Minus_clicked()
 {
     ui->scrollArea_3->setWidgetResizable(false);
     ui->widgetTaps2->resize(ui->widgetTaps2->size() + QSize(0, 150));
-    ui->scrollAreaWidgetContents_3->resize(ui->widgetTaps2->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_3->resize(ui->scrollAreaWidgetContents_3->size() + QSize(0, 150));
 }
 
 void TabRunByRun::on_buttonTaps3Minus_clicked()
 {
     ui->scrollArea_4->setWidgetResizable(false);
     ui->widgetTaps3->resize(ui->widgetTaps3->size() + QSize(0, 150));
-    ui->scrollAreaWidgetContents_4->resize(ui->widgetTaps3->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_4->resize(ui->scrollAreaWidgetContents_4->size() + QSize(0, 150));
 }
 
 void TabRunByRun::on_buttonPAR_clicked()
 {
     ui->widgetPA->GetCanvas()->Clear();
     ui->scrollArea_5->setWidgetResizable(true);
-    this->UpdateGraphicsPhysics();
+    FillWidget(ui->widgetPA, PhysicsFile, std::string("PA"), QCoreApplication::applicationDirPath().toStdString() + std::string("/config/plotdata.gui"));
+    ui->scrollArea_5->setWidgetResizable(false);
+    ui->widgetPA->resize(QSize(ui->widgetPA->size().width(), ui->widgetPA->size().height() * VerticalSizeExt[4]));
+    ui->scrollAreaWidgetContents_5->resize(QSize(ui->scrollAreaWidgetContents_5->size().width(), ui->scrollAreaWidgetContents_5->size().height() * VerticalSizeExt[4]));
 }
 
 void TabRunByRun::on_buttonPAPlus_clicked()
 {
     ui->scrollArea_5->setWidgetResizable(false);
     ui->widgetPA->resize(ui->widgetPA->size() + QSize(150, 0));
-    ui->scrollAreaWidgetContents_5->resize(ui->widgetPA->size() + QSize(150, 0));
+    ui->scrollAreaWidgetContents_5->resize(ui->scrollAreaWidgetContents_5->size() + QSize(150, 0));
 }
 
 void TabRunByRun::on_buttonTapsPAM_clicked()
 {
     ui->scrollArea_5->setWidgetResizable(false);
     ui->widgetPA->resize(ui->widgetPA->size() + QSize(0, 150));
-    ui->scrollAreaWidgetContents_5->resize(ui->widgetPA->size() + QSize(0, 150));
+    ui->scrollAreaWidgetContents_5->resize(ui->scrollAreaWidgetContents_5->size() + QSize(0, 150));
 }
 
-void TabRunByRun::UpdateTWidgetSize0()
-{
-    std::cout << "fucking number: " << VerticalSizeExt[0] << std::endl;
-    ui->scrollArea->setWidgetResizable(true);
-    ui->scrollArea->setWidgetResizable(false);
-    ui->scrollAreaWidgetContents->resize(QSize(ui->scrollAreaWidgetContents->size().width(), ui->scrollAreaWidgetContents->size().height() * VerticalSizeExt[0]));
-    ui->widget->resize(QSize(ui->widget->size().width(), ui->widget->size().height() * VerticalSizeExt[0]));
-}

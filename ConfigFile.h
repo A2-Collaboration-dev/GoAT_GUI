@@ -8,7 +8,7 @@
 #include <vector>
 #include <TROOT.h>
 #include <map>
-
+#include <math.h>
 
 class ConfigFile
 {

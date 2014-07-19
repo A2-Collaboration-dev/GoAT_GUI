@@ -278,7 +278,7 @@ void ConfigFile::writeGoATConfigFile(const std::string filename)
 
     for(int i = 0; i < (int)ParticleNames.size(); i++)
     {
-        if (!ParticleNumbers[i].empty() && !ParticleAMin[i].empty() && !ParticleAMax[i].empty())
+        if (!ParticleNumbers[i].empty() && !ParticleAMin[i].empty() && !ParticleAMax[i].empty() && ParticleNumbers[i].length() > 1)
         {
             outputData.append("Sort-Particle:").append("\t")
                       .append(ParticleNames[i]).append("\t\t")

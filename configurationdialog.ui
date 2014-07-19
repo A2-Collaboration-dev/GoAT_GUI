@@ -65,12 +65,18 @@
                         <property name="text">
                          <string>Pre Sort</string>
                         </property>
+                        <property name="checked">
+                         <bool>true</bool>
+                        </property>
                        </widget>
                       </item>
                       <item>
                        <widget class="QCheckBox" name="checkBoxCPR">
                         <property name="text">
                          <string>Particle Reconstruction</string>
+                        </property>
+                        <property name="checked">
+                         <bool>false</bool>
                         </property>
                        </widget>
                       </item>
@@ -109,7 +115,7 @@
                 <item>
                  <widget class="QToolBox" name="toolBox">
                   <property name="currentIndex">
-                   <number>3</number>
+                   <number>0</number>
                   </property>
                   <widget class="QWidget" name="page">
                    <property name="geometry">
@@ -664,7 +670,7 @@
                              </font>
                             </property>
                             <property name="text">
-                             <string>TextLabel</string>
+                             <string/>
                             </property>
                             <property name="wordWrap">
                              <bool>true</bool>

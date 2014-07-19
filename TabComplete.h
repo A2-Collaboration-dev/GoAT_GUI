@@ -38,6 +38,7 @@ public:
     void ReloadRootPhysicsFile();
 
     QPushButton* getButtonSave();
+    QPushButton* getButtonSave2();
 
 public slots:
         void UpdateAllGraphics();
@@ -86,6 +87,7 @@ private:
 
     TH2F * h2;
     void FillWidget(TQtWidget *Twidget, TFile* tfile, std::string detector, std::string filename);
+    std::vector<float> VerticalSizeExt;
 };
 
 #endif // TABCOMPLETE_H

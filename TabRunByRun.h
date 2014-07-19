@@ -21,6 +21,11 @@
 #include "ConfigGui.h"
 #include "Functions.h"
 
+#include <QWaitCondition>
+#include <QMutex>
+#include <thread>
+#include <QTime>
+
 namespace Ui {
 class TabRunByRun;
 }
@@ -34,7 +39,7 @@ public:
     ~TabRunByRun();
     void updateRootFile(const char *file);
     void updateRootPhysicsFile(const char *file);
-    float VerticalSizeExt[5];
+
 
 private slots:
     void on_pushButtonZoomIn_clicked();
@@ -78,12 +83,17 @@ private:
     int verticalSize;
     TFile*  file;
     TFile* PhysicsFile;
-    std::map <TQtWidget*, QWidget*> ContainerMap;
+
 
     TH2F * h2;
     void FillWidget(TQtWidget *Twidget, TFile* tfile, std::string detector, std::string filename);
 
-    void UpdateTWidgetSize0();
+    std::vector<float> VerticalSizeExt;
+    std::map <TQtWidget*, QWidget*> ContainerMap;
+
+    QWaitCondition waitCondition;
+    QMutex mutex;
+    void TakeANap(int ms);
 };
 
 #endif // TABRUNBYRUN_H

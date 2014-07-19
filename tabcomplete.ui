@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -27,11 +27,11 @@
        <item>
         <widget class="QTabWidget" name="tabWidget_2">
          <property name="currentIndex">
-          <number>3</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tab_3">
           <attribute name="title">
-           <string>CB</string>
+           <string>Check CB</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
@@ -44,8 +44,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>20</width>
-                <height>28</height>
+                <width>482</width>
+                <height>331</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -141,7 +141,7 @@
          </widget>
          <widget class="QWidget" name="tab_4">
           <attribute name="title">
-           <string>Taps 1</string>
+           <string>Check TAPS</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
@@ -154,8 +154,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>20</width>
-                <height>28</height>
+                <width>482</width>
+                <height>331</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -251,7 +251,7 @@
          </widget>
          <widget class="QWidget" name="tab_5">
           <attribute name="title">
-           <string>Taps 2</string>
+           <string>Check Hit Patterns</string>
           </attribute>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
@@ -264,8 +264,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>20</width>
-                <height>28</height>
+                <width>482</width>
+                <height>331</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -462,7 +462,34 @@
                <widget class="QWidget" name="widget_17" native="true"/>
               </item>
               <item>
-               <widget class="QWidget" name="widget_18" native="true"/>
+               <widget class="QWidget" name="widget_18" native="true">
+                <widget class="QPushButton" name="buttonSave2">
+                 <property name="geometry">
+                  <rect>
+                   <x>10</x>
+                   <y>40</y>
+                   <width>41</width>
+                   <height>41</height>
+                  </rect>
+                 </property>
+                 <property name="toolTip">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Resave Accumulated ACQU and Physics as different files and clean Accumulated files.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="Resources.qrc">
+                   <normaloff>:/data/cd_rom.png</normaloff>:/data/cd_rom.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>35</width>
+                   <height>35</height>
+                  </size>
+                 </property>
+                </widget>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -585,6 +612,9 @@
                <width>41</width>
                <height>41</height>
               </rect>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Resave Accumulated ACQU and Physics as different files and clean Accumulated files.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string/>

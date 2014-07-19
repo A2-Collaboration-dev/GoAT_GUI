@@ -74,8 +74,8 @@ bool ConfigGUI::loadGUIConfigFile(std::string config_file)
     this->ACQU_prefix = ReadConfig("ACQU-prefix",0,(Char_t*)config_file.c_str());
     this->GoAT_prefix = ReadConfig("GoAT-prefix",0,(Char_t*)config_file.c_str());
     this->Phys_prefix = ReadConfig("Phys-prefix",0,(Char_t*)config_file.c_str());
-    this->CompleteACQUFile = ReadConfig("Complete-acqu",0,(Char_t*)config_file.c_str());
-    this->CompletePhysicsFile = ReadConfig("Complete-physics",0,(Char_t*)config_file.c_str());
+    this->CompleteACQUFile = ReadConfig("Accumulated-acqu",0,(Char_t*)config_file.c_str());
+    this->CompletePhysicsFile = ReadConfig("Accumulated-physics",0,(Char_t*)config_file.c_str());
     return true;
 }
 
@@ -123,9 +123,9 @@ void ConfigGUI::writeGUIConfigFile(const std::string filename)
     if (this->LastPhysFile != nullValue)
         outputData.append("LastPhysFile: ").append(this->LastPhysFile).append("\n");
     if (this->CompleteACQUFile != nullValue)
-        outputData.append("Complete-acqu: ").append(this->CompleteACQUFile).append("\n");
+        outputData.append("Accumulated-acqu: ").append(this->CompleteACQUFile).append("\n");
     if (this->CompletePhysicsFile != nullValue)
-        outputData.append("Complete-physics: ").append(this->CompletePhysicsFile).append("\n");
+        outputData.append("Accumulated-physics: ").append(this->CompletePhysicsFile).append("\n");
 
         outputData.append("ACQU-prefix: ").append(this->ACQU_prefix).append("\n");
         outputData.append("GoAT-prefix: ").append(this->GoAT_prefix).append("\n");

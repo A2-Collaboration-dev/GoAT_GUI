@@ -25,7 +25,7 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
     /*
      * Disabling toolBox items
      */
-    ui->toolBox->setItemEnabled(0, false);
+    ui->toolBox->setItemEnabled(0, true);
     ui->toolBox->setItemEnabled(1, false);
     ui->toolBox->setItemEnabled(2, false);
     ui->toolBox->setItemEnabled(3, false);
@@ -34,9 +34,10 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
      * Disabling Cuts tab
      */
     ui->tabWidget->setTabEnabled(1, false);
-
     ui->pushButtonSelectCuts->setEnabled(false);
-    ui->pushButton->setEnabled(false);
+
+    /* Keep Save button Enabled at all times */
+    //ui->pushButton->setEnabled(false);
 
     /*
      * Constaining to numeric fields
@@ -72,7 +73,19 @@ ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
     ui->tabWidgetOutput->setEnabled(false);
     ui->tabWidgetInput->setTabEnabled(1, false);
 
+    configFile.loadGoATConfigFile(QCoreApplication::applicationDirPath().toStdString() + std::string("/config/GoAT-config.dat"));
+    ParticleNames = configFile.getVectorParticleNames();
+    ParticleNumbers = configFile.getVectorPParticleNumbers();
+    ParticleAMin = configFile.getVectorParticleAMin();
+    ParticleAMax = configFile.getVectorParticleAMax();
+    ParticleNameToIndex = configFile.getMapPS();
 
+
+    /* In futute it is possible to remap names */
+    for(int i = 0; i < (int)ParticleNames.size(); i++)
+        ui->ParticleBox->addItem(ParticleNames[i].c_str());
+
+    DoneConstructing = true;
 }
 
 ConfigurationDialog::~ConfigurationDialog()
@@ -558,17 +571,18 @@ void ConfigurationDialog::updateUIText()
         ui->checkBoxCPS->setChecked(true);
     }
 
-    ParticleNames = configFile.getVectorParticleNames();
-    ParticleNumbers = configFile.getVectorPParticleNumbers();
-    ParticleAMin = configFile.getVectorParticleAMin();
-    ParticleAMax = configFile.getVectorParticleAMax();
-    ParticleNameToIndex = configFile.getMapPS();
+
+//    ParticleNames = configFile.getVectorParticleNames();
+//    ParticleNumbers = configFile.getVectorPParticleNumbers();
+//    ParticleAMin = configFile.getVectorParticleAMin();
+//    ParticleAMax = configFile.getVectorParticleAMax();
+//    ParticleNameToIndex = configFile.getMapPS();
 
 
 
-    /* In futute it is possible to remap names */
-    for(int i = 0; i < (int)ParticleNames.size(); i++)
-        ui->ParticleBox->addItem(ParticleNames[i].c_str());
+//    /* In futute it is possible to remap names */
+//    for(int i = 0; i < (int)ParticleNames.size(); i++)
+//        ui->ParticleBox->addItem(ParticleNames[i].c_str());
 
 
 
@@ -656,10 +670,6 @@ void ConfigurationDialog::on_lineEditPSSortN_editingFinished()
                                  ui->lineEditPSSortN->text().toStdString());
 }
 
-void ConfigurationDialog::on_comboBox_2_currentIndexChanged(int index)
-{
-
-}
 
 void ConfigurationDialog::setPostReconstructionFields(int DropIndex, std::string number, std::string AMin, std::string AMax)
 {

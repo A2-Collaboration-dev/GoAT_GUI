@@ -161,7 +161,6 @@ private slots:
     void on_lineEditPSMax1_editingFinished();
     void on_comboBoxPSSortN_currentIndexChanged(int index);
     void on_lineEditPSSortN_editingFinished();
-    void on_comboBox_2_currentIndexChanged(int index);
     void on_ParticleBox_currentIndexChanged(int index);
     void on_lineEditPSNum1_textEdited(const QString &arg1);
     void on_lineEditPSMin1_textEdited(const QString &arg1);
