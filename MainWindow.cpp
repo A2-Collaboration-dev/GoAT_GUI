@@ -217,6 +217,8 @@ void MainWindow::RunGoat(bool Accumulate)
     }
 
     int MaxContinueAttempts = 5;
+    int AttemptEveryThisSeconds = 15;
+    int FileEditedThisSecondsAgo = 5;
 
 
     // are we attempting to check file?
@@ -262,13 +264,13 @@ void MainWindow::RunGoat(bool Accumulate)
      * Check if files was
      *  modified in x seconds, else use it
      */
-    if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-2))
+    if (qfile.lastModified() > QDateTime::currentDateTime().addSecs(-FileEditedThisSecondsAgo))
     {
         tabLog->AppendTextNL("Could not open " + TabLog::Color(this->curFile, "DarkOliveGreen") + ", trying again in 5 seconds. (" + std::to_string(MaxContinueAttempts - this->OpeningAtempt) + ")");
         std::cout << "Could not open file, maybe being written. " << this->OpeningAtempt << std::endl;
         this->OpeningAtempt++;
         //ACQUdirChanged("check_for_new_file"); // EXP
-        TakeANap(5000);
+        TakeANap(AttemptEveryThisSeconds * 1000);
         //this->FinishedACQUFiles.push_back(this->curFile);
         this->RunGoat();
         return;
