@@ -1,0 +1,13 @@
+GoAT-Executable: /home/august/a2GoAT/build/bin/goat
+Phys-Executable: /home/august/a2GoAT/build/bin/pi0-example
+ACQU-Dir: /home/august/a2GoAT/
+GoAT-Dir: /home/august/a2GoAT/goatout/
+Physics-Dir: /home/august/a2GoAT/Physics/
+LastFile: 
+LastGoATFile: 
+LastPhysFile: 
+Accumulated-acqu: /home/august/a2GoAT/Physics/Master.root
+Accumulated-physics: /home/august/a2GoAT/Physics/MasterP.root
+ACQU-prefix: Acqu_
+GoAT-prefix: GoAT_
+Phys-prefix: Physics_

@@ -1,0 +1,53 @@
+#
+# Run By Run -> Detectors
+# TemporaryGoAT.root
+
+#Check CB
+CB
+CheckCB/Check_CBdE_E
+CheckCB/Check_CBPhiCorr
+CheckCB/Check_CBdE_E
+CheckCB/Check_CBPhiCorr2
+CheckCB/Check_CBPhiCorr
+CheckCB/Check_CBdE_E
+CheckCB/Check_CBdE_E
+CheckCB/Check_CBdE_E
+CheckCB/Check_CBdE_E
+CheckCB/Check_CBdE_E
+END
+
+#Check Taps
+TAPS1
+CheckCB/Check_CBdE_E
+CheckCB/Check_CBPhiCorr
+CheckCB/Check_CBPhiCorr
+END
+
+#Check Hit Patterns
+TAPS2
+CheckCB/Check_CBdE_E
+CheckCB/Check_CBdE_E
+END
+
+#Currently hiden
+TAPS3
+END
+
+#Physics Analysis
+PA
+time_pi0
+time_pi0_cuts
+MM_prompt_pi0
+MM_random_pi0
+MM_pi0
+Para_MM_prompt_pi0
+Para_MM_random_pi0
+Para_MM_pi0
+Perp_MM_prompt_pi0
+Perp_MM_random_pi0
+Perp_MM_pi0
+Perp_MM_prompt_pi0
+Perp_MM_random_pi0
+Perp_MM_pi0
+END
+
