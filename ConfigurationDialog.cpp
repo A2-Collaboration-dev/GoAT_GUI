@@ -3,7 +3,9 @@
 
 ConfigurationDialog::ConfigurationDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::ConfigurationDialog)
+    ui(new Ui::ConfigurationDialog),
+    HorizontalPads(1),
+    VerticalPads(2)
 {
     ui->setupUi(this);
 

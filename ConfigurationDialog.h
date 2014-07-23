@@ -101,8 +101,8 @@ private:
     ConfigGUI configGUI;
     TTree*  tree;
 
-    unsigned int HorizontalPads = 1;
-    unsigned int VerticalPads = 2;
+    unsigned int HorizontalPads;
+    unsigned int VerticalPads;
 
     std::map<const char*, TLine*, cmp_str> MaxValMap;
     std::map<const char*, TLine*, cmp_str> MinValMap;
