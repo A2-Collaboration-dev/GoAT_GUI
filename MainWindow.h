@@ -94,6 +94,10 @@ private:
 
     bool TransientState;
 
+    void CopyFileRecreate(const char *fname);
+    void CopyFileUpdate(const char *fname);
+    void CopyDirRecreate(TDirectory *source, const char* filename);
+    void CopyDirUpdate(TDirectory *source, const char* filename);
 
 private slots:
 
@@ -113,9 +117,11 @@ private slots:
   void QueueDialogConfirm();
   void StartQueue();
   void CompleteButtonSave();
+  void PrintOutputStream();
 
   std::string getNewestFile(std::string iDirIn, char* extension);
   void ExcludeFiles(std::string iDirIn, char* extension, bool includeNewest);
+  void resizeEvent(QResizeEvent* event);
 };
 
 #endif // MAINWINDOW_H

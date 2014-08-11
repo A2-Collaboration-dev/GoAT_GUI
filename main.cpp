@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow *w = new MainWindow;
     (*w).setWindowTitle("GoAT - GUI");
-    (*w).setWindowIcon(QIcon(":/icons/data/Fixicon-Farm-Goat.ico"));
+    (*w).setWindowIcon(QIcon(":/icons/data/frank.ico"));
 
     QObject::connect(&a, SIGNAL(aboutToQuit()), w, SLOT(ExitingGoat()));
 

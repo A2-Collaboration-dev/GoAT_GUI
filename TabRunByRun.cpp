@@ -214,7 +214,7 @@ void TabRunByRun::FillWidget(TQtWidget *Twidget,TFile* tfile, std::string detect
     if (Twidget == ui->widgetPA)
          this->VerticalSizeExt[4] = static_cast<float>(verticalSize)/3 > 1 ? static_cast<float>(verticalSize)/3 : 1;
 
-    Twidget->GetCanvas()->Divide(horizontalSize, verticalSize);
+    Twidget->GetCanvas()->Divide(horizontalSize, verticalSize, 0.00001, 0.00001, 0);
     for(int i = 0; i < static_cast<int>(histList.size()); i++)
     {
         Twidget->cd(1 + i);

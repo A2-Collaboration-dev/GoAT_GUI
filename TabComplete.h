@@ -36,6 +36,8 @@ public:
     void updateRootPhysicsFile(const char *file);
     void ReloadRootFile();
     void ReloadRootPhysicsFile();
+    void CloseFile();
+
 
     QPushButton* getButtonSave();
     QPushButton* getButtonSave2();
@@ -75,6 +77,7 @@ private slots:
         void on_buttonPAPlus_clicked();
 
         void on_buttonTapsPAM_clicked();
+
 
 private:
     Ui::TabComplete *ui;

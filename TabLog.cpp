@@ -11,9 +11,15 @@ TabLog::TabLog(QWidget *parent) :
 
     LogFileName = date.toString("yyyy MM dd - ").toStdString() + QTime::currentTime().toString().toStdString();
 
+    StartTime = QTime::currentTime();
 
     connect(ui->textBrowser, SIGNAL(textChanged()), this, SLOT(WriteLogToFile()));
 
+    UpdateTimer = new QTimer(this);
+    connect(UpdateTimer, SIGNAL(timeout()), this, SLOT(TimerUpdate()));
+    UpdateTimer->start(100);
+
+    FileCounter = 0;
 }
 
 TabLog::~TabLog()
@@ -137,6 +143,11 @@ QPushButton* TabLog::getButtonStartQueue()
     return ui->buttonStartQueue;
 }
 
+QPushButton* TabLog::getButtonOutStream()
+{
+    return ui->buttonOutStream;
+}
+
 void TabLog::WriteLogToFile()
 {
     std::ofstream outfile (QCoreApplication::applicationDirPath().toStdString() + std::string("/logs/" + LogFileName + ".txt"), std::ofstream::binary);
@@ -150,4 +161,18 @@ void TabLog::on_pushButton_clicked()
 {
     ui->textBrowser->setText("");
     LogFileName = QDate::currentDate().toString().toStdString() + QTime::currentTime().toString().toStdString();
+}
+
+void TabLog::TimerUpdate()
+{
+    QTime CurrentTime = QTime::currentTime();
+    QTime Difference = CurrentTime.addSecs(-QTime().secsTo(StartTime));
+    ui->uptimeTime->setText(Difference.toString());
+    UpdateTimer->start(1000);
+}
+
+void TabLog::IncreaseFileCounter()
+{
+    FileCounter++;
+    ui->FilesCounter->setText(std::to_string(FileCounter).c_str());
 }

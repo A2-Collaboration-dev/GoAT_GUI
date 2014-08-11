@@ -684,8 +684,8 @@ void ConfigurationDialog::on_ParticleBox_currentIndexChanged(int index)
     {
         ui->comboBoxPS1->setCurrentIndex(InverseResolvingBoxIndex(ParticleNumbers[index].substr(ParticleNumbers[index].length()-1, 1)));
         ui->lineEditPSNum1->setText(ParticleNumbers[index].substr(0,  ParticleNumbers[index].length() - 1).c_str());
-        ui->lineEditPSMin1->setText(ParticleAMin[index].c_str());
-        ui->lineEditPSMax1->setText(ParticleAMax[index].c_str());
+        ui->lineEditPSMin1->setText(ParticleAMin[index].substr(0,4).c_str());
+        ui->lineEditPSMax1->setText(ParticleAMax[index].substr(0,4).c_str());
     } else {
         ui->lineEditPSNum1->setText("");
         ui->lineEditPSMin1->setText("");
@@ -705,7 +705,7 @@ void ConfigurationDialog::on_lineEditPSMin1_textEdited(const QString &arg1)
 {
     if (!DoneConstructing) return;
 
-    ParticleAMin[ui->ParticleBox->currentIndex()] = ui->lineEditPSMin1->text().toStdString();
+    ParticleAMin[ui->ParticleBox->currentIndex()] = ui->lineEditPSMin1->text().toStdString().substr(0, 4);
     UpdateLabel();
 }
 
@@ -713,7 +713,7 @@ void ConfigurationDialog::on_lineEditPSMax1_textEdited(const QString &arg1)
 {
     if (!DoneConstructing) return;
 
-    ParticleAMax[ui->ParticleBox->currentIndex()] = ui->lineEditPSMax1->text().toStdString();
+    ParticleAMax[ui->ParticleBox->currentIndex()] = ui->lineEditPSMax1->text().toStdString().substr(0, 4);
     UpdateLabel();
 }
 

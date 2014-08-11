@@ -72,7 +72,7 @@ ConfigFile::ConfigFile()
     this->TimeCutMinApparatus2 = nullValue;
     this->TimeCutMaxApparatus2 = nullValue;
 
-    this->ParticleNames = {"rootino", "gamma", "n", "p", "e-", "pi+pi-", "pi0", "eta", "eta'", "charged", "neutral"};
+    this->ParticleNames = {"rootino", "gamma", "n", "proton", "e-", "pi+pi-", "pi0", "eta", "eta'", "charged", "neutral"};
     for(int i = 0; i < (int)ParticleNames.size(); i++)
         this->ParticleNameToIndex[ParticleNames[i]] = i;
 
@@ -206,7 +206,10 @@ void ConfigFile::writeGoATConfigFile(const std::string filename)
 
     outputData.append(TextFields[0]);
     outputData.append(TextFields[1]);
-    //outputData.append("Period-Macro:	100000\nCheckCBStability: 1\n");
+    outputData.append("Period-Macro:	100000\nCheckCBStability: 1\n");
+    outputData.append("CB-all-photons").append("\n");
+    outputData.append("TAPS-all-photons").append("\n");
+
 
     if (this->ParticleReconstruction != nullValue)
         outputData.append("Do-Particle-Reconstruction: ").append(this->ParticleReconstruction).append("\n");

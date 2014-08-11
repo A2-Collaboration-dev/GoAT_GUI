@@ -6,8 +6,8 @@
 #include <iostream>
 #include <QPushButton>
 #include <fstream>
-
-
+#include <QTimer>
+#include <string>
 #include <QMovie>
 
 namespace Ui {
@@ -21,6 +21,8 @@ class TabLog : public QWidget
 public:
     explicit TabLog(QWidget *parent = 0);
     ~TabLog();
+
+    int FileCounter;
 
     void AppendTextNL(std::string str);
     void AppendTextNL(std::string title, std::string str);
@@ -48,6 +50,10 @@ public:
     QPushButton* getButtonList();
     QPushButton* getButtonEditQueue();
     QPushButton* getButtonStartQueue();
+    QPushButton* getButtonOutStream();
+
+    QTime StartTime;
+    QTimer* UpdateTimer;
 
 private:
     Ui::TabLog *ui;
@@ -59,6 +65,10 @@ private:
 private slots:
     void WriteLogToFile();
     void on_pushButton_clicked();
+    void TimerUpdate();
+
+public slots:
+    void IncreaseFileCounter();
 };
 
 #endif // TABLOG_H

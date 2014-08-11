@@ -108,6 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->GoATProcess = new QProcess(this);
     this->GoATarguments = new QStringList;
     connect(GoATProcess, SIGNAL(finished(int)), this, SLOT(newGoatFile()));
+    connect(GoATProcess, SIGNAL(finished(int)), tabLog, SLOT(IncreaseFileCounter()));
 
     /*
      * Signal of when Physics Analysis is finished
@@ -126,6 +127,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tabLog->getButtonKillPhys(), SIGNAL(clicked()), this, SLOT(killPhysicsProcess()));
     connect(tabLog->getButtonList(), SIGNAL(clicked()), this, SLOT(ListQueue()));
     connect(tabLog->getButtonStartQueue(), SIGNAL(clicked()), this, SLOT(StartQueue()));
+    connect(tabLog->getButtonOutStream(), SIGNAL(clicked()), this, SLOT(PrintOutputStream()));
 
     /*
      * Complete Window Save button
@@ -521,146 +523,19 @@ void MainWindow::on_actionToggle_Plot_lock_triggered()
 
 void MainWindow::CompleteExperimentDataUpdate(const char *inputFile, const char *outputFile)
 {
-
-    TFile *out = new TFile(outputFile, "UPDATE");
-    TFile *in = new TFile(inputFile);
-    TKey *key;
-    TIter nextkey(in->GetListOfKeys());
-    TDirectory *currentDir;
-
-    while((key = (TKey*)nextkey()))
-    {
-        const char *classname = key->GetClassName();
-        TClass *cl = gROOT->GetClass(classname);
-        TObject *obj = key->ReadObj();
-
-        if (!cl) continue;
-        //std::cout << obj->GetName() << std::endl;
-
-        in->cd();
-        currentDir = in;
-        if (cl->InheritsFrom("TDirectory"))
-        {
-            //std::cout << "\t(directory above)" << std::endl;
-
-            currentDir->cd(obj->GetName());
-            out->mkdir(obj->GetName());
-
-            TKey* dKey;
-            TIter dnextkey(gDirectory->GetListOfKeys()); // !@#
-            while((dKey = (TKey*)dnextkey()))
-            {
-                //const char *dclassname = key->GetClassName();
-                //TClass *dcl = gROOT->GetClass(dclassname);
-                TObject *dobj = dKey->ReadObj();
-
-                // TH2 *InHist = (TH2*)dobj;
-
-                TH2 *InHist = (TH2*)dobj;
-
-
-                std::string Folder(obj->GetName());
-                std::string HistName(dobj->GetName());
-                std::string FullPath = Folder + "/" + HistName;
-
-                std::cout << "Looking for: " << FullPath.c_str() << std::endl;
-
-                out->cd();
-                TH2 *OutHist = (TH2*)out->Get( FullPath.c_str() );
-
-                if (OutHist != NULL)
-                {
-                    std::cout << "Histogram found updating." << dobj->GetName() << std::endl;
-                    OutHist->Add(InHist);
-                    out->cd(obj->GetName());
-                    OutHist->Write();
-                } else
-                {
-                    std::cout << "Could not find histogram, adding. " << dobj->GetName() << std::endl;
-                    out->cd(obj->GetName());
-                    dobj->Write();
-                }
-            }
-        }
-
-        if (cl->InheritsFrom("TTree"))
-        {
-            // Do not copy trees
-        } else {
-            // Individual files
-            TH2 *InHist = (TH2*)obj;
-            TH2 *OutHist = (TH2*)out->Get( obj->GetName() );
-            if (OutHist != NULL)
-            {
-                std::cout << "Doing individual updating " << obj->GetName() <<  std::endl;
-                OutHist->Add(InHist);
-                out->cd();
-                OutHist->Write();
-            } else {
-                std::cout << "Doing individual updating " <<   obj->GetName() << std::endl;
-                out->cd();
-                obj->Write();
-            }
-        }
-    }
-    in->Close();
-    out->Close();
+    TFile *f = new TFile(outputFile,"UPDATE");
+    CopyFileUpdate(inputFile);
+    f->Close();
 }
+
 
 void MainWindow::CompleteExperimentDataCreate(const char *inputFile, const char *outputFile)
 {
-    TFile *out = new TFile(outputFile, "RECREATE");
-    TFile *in = new TFile(inputFile);
-    TKey *key;
-    TIter nextkey(in->GetListOfKeys());
-    TDirectory *currentDir;
-
-    while((key = (TKey*)nextkey()))
-    {
-        const char *classname = key->GetClassName();
-        TClass *cl = gROOT->GetClass(classname);
-        TObject *obj = key->ReadObj();
-
-        if (!cl) continue;
-        //std::cout << obj->GetName() << std::endl;
-
-        in->cd();
-        currentDir = in;
-        if (cl->InheritsFrom("TDirectory"))
-        {
-            std::cout << "\t(directory above)" << std::endl;
-
-            currentDir->cd(obj->GetName());
-            out->mkdir(obj->GetName());
-
-            TKey* dKey;
-            TIter dnextkey(gDirectory->GetListOfKeys()); // !@#
-            while((dKey = (TKey*)dnextkey()))
-            {
-                //const char *dclassname = key->GetClassName();
-                //TClass *dcl = gROOT->GetClass(dclassname);
-                TObject *dobj = dKey->ReadObj();
-
-                std::cout << "Copying: " << dobj->GetName() <<std::endl;
-                out->cd(obj->GetName());
-                dobj->Write();
-
-            }
-        }
-
-        if (cl->InheritsFrom("TTree"))
-        {
-            // Do not copy trees
-        } else {
-            // Individual objects not in folder
-            std::cout << "Doing individual creating" << std::endl;
-            out->cd();
-            obj->Write();
-        }
-    }
-    in->Close();
-    out->Close();
+    TFile *f = new TFile(outputFile,"RECREATE");
+    CopyFileRecreate(inputFile);
+    f->Close();
 }
+
 
 void MainWindow::UpdateCompleteACQU(const char* inputFile)
 {
@@ -675,7 +550,10 @@ void MainWindow::UpdateCompleteACQU(const char* inputFile)
         CompleteExperimentDataCreate(inputFile, configGUI.getCompleteACQUFile().c_str());
     } else {
         std::cout << "Updating Complete experiment data file." << std::endl;
+        tabComplete->CloseFile();
         CompleteExperimentDataUpdate(inputFile, configGUI.getCompleteACQUFile().c_str());
+        tabComplete->ReloadRootFile();
+        tabComplete->UpdateGraphicsDetectors();
     }
 }
 
@@ -810,4 +688,163 @@ void MainWindow::CompleteButtonSave()
 
     QFile::remove(configGUI.getCompletePhysicsFile().c_str());
     QFile::remove(configGUI.getCompleteACQUFile().c_str());
+}
+
+void MainWindow::PrintOutputStream()
+{
+    QString g_stdout = GoATProcess->readAllStandardOutput();
+    QString p_stdout = PhysicsProcess->readAllStandardOutput();
+
+    if (g_stdout.toStdString() != "")
+    {
+        tabLog->AppendTextNL("GoAT Output stream:");
+        tabLog->AppendTextNL(g_stdout.toStdString());
+    }
+    if (p_stdout.toStdString() != "")
+    {
+        tabLog->AppendTextNL("Physics Output stream:");
+        tabLog->AppendTextNL(p_stdout.toStdString());
+    }
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+   QMainWindow::resizeEvent(event);
+   //tabRunByRun->UpdateAllGraphics();
+   //tabComplete->UpdateAllGraphics();
+}
+
+void MainWindow::CopyDirUpdate(TDirectory *source, const char* filename) {
+   //copy all objects and subdirs of directory source as a subdir of the current directory
+   source->ls();
+   TDirectory *savdir = gDirectory;
+   TDirectory *adir;
+
+   if (std::string(source->GetName()) == std::string(filename))
+   {
+       adir = savdir;
+   } else {
+       adir =  savdir->mkdir(source->GetName());
+       if (adir == nullptr) {
+           gDirectory->cd(source->GetName());
+           adir = gDirectory;
+        }
+   }
+
+   //loop on all entries of this directory
+   TKey *key;
+   TIter nextkey(source->GetListOfKeys());
+   while ((key = (TKey*)nextkey())) {
+      const char *classname = key->GetClassName();
+      TClass *cl = gROOT->GetClass(classname);
+      if (!cl) continue;
+      if (cl->InheritsFrom(TDirectory::Class())) {
+         source->cd(key->GetName());
+         TDirectory *subdir = gDirectory;
+         adir->cd();
+         CopyDirUpdate(subdir, filename);
+         adir->cd();
+      } else if (cl->InheritsFrom(TTree::Class())) {
+         //TTree *T = (TTree*)source->Get(key->GetName());
+         //adir->cd();
+         //TTree *newT = T->CloneTree(-1,"fast");
+         //newT->Write();
+      } else {
+         source->cd();
+         if (std::string(key->ReadObj()->GetName()) == "Physics_File")
+         {
+             std::cout << "Physics_File found" << std::endl;
+             continue;
+         }
+         std::cout << "Accessing: " << key->ReadObj()->GetName() << std::endl;
+         TH2F *obj = (TH2F*)key->ReadObj();
+         adir->cd();
+         TH2F* oldObj = (TH2F*)adir->Get(obj->GetName());
+         if (oldObj != nullptr)
+             std::cout << "Copying: " << oldObj->GetName() << std::endl;
+         oldObj->Add(obj);
+         oldObj->Write();
+         delete obj;
+         delete oldObj;
+     }
+  }
+  adir->SaveSelf(kTRUE);
+  savdir->cd();
+}
+
+void MainWindow::CopyDirRecreate(TDirectory *source, const char* filename) {
+   //copy all objects and subdirs of directory source as a subdir of the current directory
+   source->ls();
+   TDirectory *savdir = gDirectory;
+   TDirectory *adir;
+
+   if (std::string(source->GetName()) == std::string(filename))
+   {
+       adir = savdir;
+   } else {
+       adir =  savdir->mkdir(source->GetName());
+       if (adir == nullptr) {
+           gDirectory->cd(source->GetName());
+           adir = gDirectory;
+        }
+   }
+
+   //loop on all entries of this directory
+   TKey *key;
+   TIter nextkey(source->GetListOfKeys());
+   while ((key = (TKey*)nextkey())) {
+      const char *classname = key->GetClassName();
+      TClass *cl = gROOT->GetClass(classname);
+      if (!cl) continue;
+      if (cl->InheritsFrom(TDirectory::Class())) {
+         source->cd(key->GetName());
+         TDirectory *subdir = gDirectory;
+         adir->cd();
+         CopyDirRecreate(subdir, filename);
+         adir->cd();
+      } else if (cl->InheritsFrom(TTree::Class())) {
+        // TTree *T = (TTree*)source->Get(key->GetName());
+        // adir->cd();
+        // TTree *newT = T->CloneTree(-1,"fast");
+        // newT->Write();
+      } else {
+         source->cd();
+         TObject *obj = key->ReadObj();
+         adir->cd();
+         obj->Write();
+         delete obj;
+     }
+  }
+  adir->SaveSelf(kTRUE);
+  savdir->cd();
+}
+
+void MainWindow::CopyFileUpdate(const char *fname) {
+   //Copy all objects and subdirs of file fname as a subdir of the current directory
+   TDirectory *target = gDirectory;
+   TFile *f = TFile::Open(fname);
+   if (!f || f->IsZombie()) {
+      printf("Cannot copy file: %s\n",fname);
+      target->cd();
+      return;
+   }
+   target->cd();
+   CopyDirUpdate(f,fname);
+   delete f;
+   target->cd();
+}
+
+void MainWindow::CopyFileRecreate(const char *fname) {
+   //Copy all objects and subdirs of file fname as a subdir of the current directory
+   TDirectory *target = gDirectory;
+   TFile *f = TFile::Open(fname);
+   if (!f || f->IsZombie()) {
+      printf("Cannot copy file: %s\n",fname);
+      target->cd();
+      return;
+   }
+   target->cd();
+   CopyDirRecreate(f,fname);
+   delete f;
+   target->cd();
 }

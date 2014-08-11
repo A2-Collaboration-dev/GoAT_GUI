@@ -31,8 +31,10 @@ TabComplete::TabComplete(QWidget *parent) :
     ui->tabWidget_2->removeTab(3);
     //ui->tabWidget_2->setTabEnabled(3, false);
 
+    std::cout << "init error" << std::endl;
     this->UpdateGraphicsDetectors();
     this->UpdateGraphicsPhysics();
+    std::cout << "init error" << std::endl;
 }
 
 TabComplete::~TabComplete()
@@ -117,7 +119,7 @@ void TabComplete::FillWidget(TQtWidget *Twidget, TFile* tfile, std::string detec
     if (Twidget == ui->widgetPA)
          this->VerticalSizeExt[4] = static_cast<float>(verticalSize)/3 > 1 ? static_cast<float>(verticalSize)/3 : 1;
 
-    Twidget->GetCanvas()->Divide(horizontalSize, verticalSize);
+    Twidget->GetCanvas()->Divide(horizontalSize, verticalSize, 0.00001, 0.00001, 0);
     for(int i = 0; i < static_cast<int>(histList.size()); i++)
     {
         Twidget->cd(1 + i);
@@ -305,4 +307,9 @@ QPushButton* TabComplete::getButtonSave()
 QPushButton* TabComplete::getButtonSave2()
 {
     return ui->buttonSave2;
+}
+
+void TabComplete::CloseFile()
+{
+    this->file->Close();
 }
